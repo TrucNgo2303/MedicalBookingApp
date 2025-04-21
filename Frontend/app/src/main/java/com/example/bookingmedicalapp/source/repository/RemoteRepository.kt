@@ -103,4 +103,14 @@ class RemoteRepository : IRemoteDataSource {
             .applySchedulers()
     }
 
+    override fun createAppointment(request: AppointmentRequest): Observable<AppointmentResponse> {
+        return dataSource.createAppointment(request)
+            .applySchedulers()
+    }
+
+    override fun checkDoctorAppointment(request: DoctorDetailRequest): Observable<BasePatientResponse<List<CheckAppointmentResponse>>> {
+        return dataSource.checkDoctorAppointment(request)
+            .applySchedulers()
+    }
+
 }

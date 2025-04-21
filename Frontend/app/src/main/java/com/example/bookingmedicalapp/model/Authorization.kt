@@ -3,7 +3,8 @@ package com.example.bookingmedicalapp.model
 data class LoginBody(
     val message: String?,
     val token: String,
-    val authorization_id: Int?
+    val authorization_id: Int?,
+    val role: String?
 )
 
 data class LoginRequest(

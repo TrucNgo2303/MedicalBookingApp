@@ -92,6 +92,7 @@ internal class DoctorDetailFragment : BaseDataBindingFragment<FragmentDoctorDeta
                     mainViewModel.doctor_specialy = doctor.specialty
                     mainViewModel.doctor_qualification = doctor.qualification
                     mainViewModel.doctor_avatar = doctor.avatar
+                    mainViewModel.fee = doctor.consultation_fee
                 },{ throwable ->
                     Log.e("API", "API ERROR: $throwable")
                 })

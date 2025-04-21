@@ -21,5 +21,7 @@ router.post('/get-all-comments', verify.verifyToken, patientCommentController.ge
 router.post('/get-all-reply', verify.verifyToken, patientCommentController.get_all_reply)
 router.post('/add-comment', verify.verifyToken, patientCommentController.add_comment)
 router.post('/add-reply', verify.verifyToken, patientCommentController.add_reply)
+router.post('/create-appointment', verify.verifyToken, patientAppointmentController.create_appointment)
+router.post('/check-doctor-appointment', verify.verifyToken, patientAppointmentController.check_doctor_appointment)
 
 module.exports = router;

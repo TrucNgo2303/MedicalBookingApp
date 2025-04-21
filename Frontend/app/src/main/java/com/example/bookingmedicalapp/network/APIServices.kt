@@ -56,5 +56,10 @@ interface APIServices {
     @POST("/patient/get-all-reply")
     fun getAllReply(@Body request: ReplyRequest): Observable<BasePatientResponse<List<ReplyResponse>>>
 
+    @POST("/patient/create-appointment")
+    fun createAppointment(@Body request: AppointmentRequest): Observable<AppointmentResponse>
+
+    @POST("/patient/check-doctor-appointment")
+    fun checkDoctorAppointment(@Body request: DoctorDetailRequest): Observable<BasePatientResponse<List<CheckAppointmentResponse>>>
 
 }

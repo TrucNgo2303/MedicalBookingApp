@@ -11,6 +11,8 @@ class MainViewModel: ViewModel() {
     var full_name: String? = null
     var password: String? = null
 
+    var patientId: Int? = null
+    var fee: String? = null
 
     //Doctor Detail
     val doctor_id_1 = MutableLiveData<Int?>()

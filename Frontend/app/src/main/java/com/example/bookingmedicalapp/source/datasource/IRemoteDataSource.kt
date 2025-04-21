@@ -35,8 +35,12 @@ interface IRemoteDataSource {
 
     fun getSpecialist(request: SpecialistDetailRequest): Observable<BasePatientResponse<SpecialistResponse>>
 
-    fun getAllComments(@Body request: CommentRequest): Observable<BasePatientResponse<List<CommentResponse>>>
+    fun getAllComments(request: CommentRequest): Observable<BasePatientResponse<List<CommentResponse>>>
 
-    fun getAllReply(@Body request: ReplyRequest): Observable<BasePatientResponse<List<ReplyResponse>>>
+    fun getAllReply(request: ReplyRequest): Observable<BasePatientResponse<List<ReplyResponse>>>
+
+    fun createAppointment(request: AppointmentRequest): Observable<AppointmentResponse>
+
+    fun checkDoctorAppointment(request: DoctorDetailRequest): Observable<BasePatientResponse<List<CheckAppointmentResponse>>>
 
 }

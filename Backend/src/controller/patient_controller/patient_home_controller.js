@@ -88,8 +88,8 @@ const top_doctors = async (req, res) => {
 
 
 const search_result = async (req, res) => {
-    const sqlDoctors = `SELECT full_name FROM Doctors`;
-    const sqlSpecialists = `SELECT DISTINCT specialist_name FROM specialists`;
+    const sqlDoctors = `SELECT doctor_id, full_name FROM Doctors`;
+    const sqlSpecialists = `SELECT specialist_id, specialist_name FROM Specialists`; // Bỏ DISTINCT, dùng GROUP BY nếu cần
 
     connection.query(sqlDoctors, (errDoctors, doctors) => {
         if (errDoctors) {
@@ -101,11 +101,19 @@ const search_result = async (req, res) => {
                 return res.status(500).json({ error: "Lỗi truy vấn database (Specialists)" });
             }
 
-            // Format danh sách bác sĩ (Thêm "Bs.")
-            const doctorList = doctors.map(doc => ({ name: `Bs. ${doc.full_name}` }));
+            // Format danh sách bác sĩ
+            const doctorList = doctors.map(doc => ({
+                doctor_id: doc.doctor_id,
+                specialist_id: null,
+                name: `Bs. ${doc.full_name}`
+            }));
 
-            // Format danh sách chuyên khoa (Thêm "Ck.")
-            const specialistList = specialists.map(spec => ({ name: `Ck. ${spec.specialist_name}` }));
+            // Format danh sách chuyên khoa
+            const specialistList = specialists.map(spec => ({
+                doctor_id: null,
+                specialist_id: spec.specialist_id,
+                name: `Ck. ${spec.specialist_name}`
+            }));
 
             const responseData = [...doctorList, ...specialistList];
 
@@ -116,6 +124,7 @@ const search_result = async (req, res) => {
         });
     });
 };
+
 
 
 module.exports = {

@@ -26,6 +26,8 @@ data class TopDoctorResponse(
 )
 
 data class SearchResultBody(
+    val doctor_id: Int?,
+    val specialist_id: Int?,
     val name: String
 )
 
@@ -43,6 +45,7 @@ data class DoctorDetailResponse(
     val summary: String?,
     val avatar: String?,
     val patient_count: String?,
+    val consultation_fee: String?,
     val average_star: String?,
     val total_comments: String?,
 )

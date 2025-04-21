@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookingmedicalapp.R
 import com.example.bookingmedicalapp.model.DateModel
@@ -36,17 +37,20 @@ class CalendarAdapter(
 
         if (dateModel.fullDate == selectedDate) {
             holder.itemLayout.setBackgroundResource(R.drawable.bg_date_selected)
+            holder.dayText.setTextColor(ContextCompat.getColor(holder.itemView.context, android.R.color.black))
+            holder.dateText.setTextColor(ContextCompat.getColor(holder.itemView.context, android.R.color.black))
         } else {
             holder.itemLayout.setBackgroundResource(R.drawable.bg_date)
+            holder.dayText.setTextColor(ContextCompat.getColor(holder.itemView.context, android.R.color.black))
+            holder.dateText.setTextColor(ContextCompat.getColor(holder.itemView.context, android.R.color.black))
         }
 
         holder.itemView.setOnClickListener {
             selectedDate = dateModel.fullDate
             notifyDataSetChanged()
-            onDateSelected(selectedDate) // Gửi ngày về Activity/Fragment
+            onDateSelected(selectedDate)
         }
     }
-
 
     override fun getItemCount() = days.size
 }

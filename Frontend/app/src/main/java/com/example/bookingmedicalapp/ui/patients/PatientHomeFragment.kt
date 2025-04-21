@@ -78,6 +78,7 @@ internal class PatientHomeFragment : BaseDataBindingFragment<FragmentPatientHome
                 val fullName = patientInfo.full_name
                 val lastName = fullName?.substringAfterLast(" ") // Lấy từ cuối cùng sau dấu cách
                 mBinding.tvName.text = lastName
+                mainViewModel.patientId = patientInfo.patient_id
 
                 // Cập nhật danh sách chuyên khoa
                 val specialistTextView = listOf(

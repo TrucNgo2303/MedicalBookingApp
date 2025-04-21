@@ -16,6 +16,7 @@ import com.example.bookingmedicalapp.databinding.FragmentSignInBinding
 import com.example.bookingmedicalapp.model.LoginRequest
 import com.example.bookingmedicalapp.source.repository.RemoteRepository
 import com.example.bookingmedicalapp.ui.bottomNav.BottomNavMainActivity
+import com.example.bookingmedicalapp.ui.doctors.DoctorHomeFragment
 import com.example.bookingmedicalapp.ui.patients.PatientHomeFragment
 import com.example.bookingmedicalapp.utils.TokenAction
 import com.example.bookingmedicalapp.utils.addFragment
@@ -87,10 +88,16 @@ internal class SignInFragment : BaseDataBindingFragment<FragmentSignInBinding,Si
                 val sharedPref = TokenAction(requireContext())
                 sharedPref.saveToken(response.token)
                 Constants.token = sharedPref.getToken()
-                val intent =  Intent(requireContext(), BottomNavMainActivity::class.java)
-                startActivity(intent)
                 Log.d("Api", "Api Response $response")
-
+                val role = response.role
+                if (role == "Patient"){
+                    val intent =  Intent(requireContext(), BottomNavMainActivity::class.java)
+                    startActivity(intent)
+                }else if(role == "Doctor"){
+                    parentFragmentManager.addFragment(fragment = DoctorHomeFragment.newInstance())
+                }else{
+                    
+                }
             }, { throwable ->
                 Log.d("Api", "API Error ${throwable.message}")
 
