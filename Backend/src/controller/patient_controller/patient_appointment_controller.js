@@ -85,53 +85,81 @@ const create_appointment = (req, res) => {
     const formattedTime = appointment_time.length === 5 ? appointment_time + ':00' : appointment_time;
     const appointment_datetime = `${appointment_date} ${formattedTime}`;
 
-    const checkQuery = `
-        SELECT * FROM Appointments 
-        WHERE doctor_id = ? AND appointment_datetime = ?
+    // 1. Lấy max_patients_per_slot của bác sĩ
+    const getMaxPatientsQuery = `
+        SELECT s.max_patients_per_slot 
+        FROM Doctors d
+        JOIN Specialists s ON d.specialist_id = s.specialist_id
+        WHERE d.doctor_id = ?
     `;
 
-    connection.query(checkQuery, [doctor_id, appointment_datetime], (checkErr, checkResults) => {
-        if (checkErr) {
-            console.error('Lỗi khi kiểm tra cuộc hẹn:', checkErr);
+    connection.query(getMaxPatientsQuery, [doctor_id], (maxErr, maxResults) => {
+        if (maxErr) {
+            console.error('Lỗi khi lấy max_patients_per_slot:', maxErr);
             return res.status(500).json({ error: 'Lỗi máy chủ' });
         }
 
-        if (checkResults.length > 0) {
-            // Trùng lịch hẹn
-            return res.status(200).json({ message: 'Fail' });
+        if (maxResults.length === 0) {
+            return res.status(404).json({ error: 'Không tìm thấy bác sĩ' });
         }
 
-        // Không trùng, tiến hành thêm mới
-        const insertQuery = `
-            INSERT INTO Appointments 
-            (patient_id, doctor_id, appointment_datetime, status, reason, is_deposit, consultation_fee, is_online)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        const maxPatients = maxResults[0].max_patients_per_slot;
+
+        // 2. Đếm số cuộc hẹn tại thời điểm đó và kiểm tra nếu có is_online = true
+        const countAndOnlineQuery = `
+            SELECT COUNT(*) AS count,
+                   SUM(CASE WHEN is_online = TRUE THEN 1 ELSE 0 END) AS online_count
+            FROM Appointments 
+            WHERE doctor_id = ? AND appointment_datetime = ?
         `;
 
-        const values = [
-            patient_id,
-            doctor_id,
-            appointment_datetime,
-            status,
-            reason,
-            is_deposit,
-            consultation_fee,
-            is_online
-        ];
-
-        connection.query(insertQuery, values, (insertErr, results) => {
-            if (insertErr) {
-                console.error('Lỗi khi thêm cuộc hẹn:', insertErr);
+        connection.query(countAndOnlineQuery, [doctor_id, appointment_datetime], (countErr, countResults) => {
+            if (countErr) {
+                console.error('Lỗi khi kiểm tra cuộc hẹn:', countErr);
                 return res.status(500).json({ error: 'Lỗi máy chủ' });
             }
 
-            res.status(201).json({
-                message: 'Success'
+            const currentCount = countResults[0].count;
+            const onlineCount = countResults[0].online_count;
+
+            // 3. Kiểm tra giới hạn số lượng và is_online
+            if (currentCount >= maxPatients) {
+                return res.status(200).json({ message: 'Fail', reason: 'Số lượng slot đã đầy' });
+            }
+
+            if (is_online && onlineCount >= 1) {
+                return res.status(200).json({ message: 'Fail', reason: 'Đã có cuộc hẹn online trong slot này' });
+            }
+
+            // 4. Tạo cuộc hẹn mới
+            const insertQuery = `
+                INSERT INTO Appointments 
+                (patient_id, doctor_id, appointment_datetime, status, reason, is_deposit, consultation_fee, is_online)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            `;
+
+            const values = [
+                patient_id,
+                doctor_id,
+                appointment_datetime,
+                status,
+                reason,
+                is_deposit,
+                consultation_fee,
+                is_online
+            ];
+
+            connection.query(insertQuery, values, (insertErr, results) => {
+                if (insertErr) {
+                    console.error('Lỗi khi thêm cuộc hẹn:', insertErr);
+                    return res.status(500).json({ error: 'Lỗi máy chủ' });
+                }
+
+                res.status(201).json({ message: 'Success' });
             });
         });
     });
 };
-
 
 const check_doctor_appointment = (req, res) => {
     const { doctor_id } = req.body;
@@ -142,7 +170,7 @@ const check_doctor_appointment = (req, res) => {
 
     const query = `
         SELECT appointment_datetime FROM Appointments 
-        WHERE doctor_id = ?
+        WHERE doctor_id = ? AND is_online = true
     `;
 
     connection.query(query, [doctor_id], (err, results) => {
