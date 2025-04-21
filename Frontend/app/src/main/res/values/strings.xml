@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">BookingMedicalApp</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello_sign_in">Chào bạn, rất vui được gặp lại!</string>
+    <string name="hope_sign_in">Mong bạn vẫn khỏe mạnh và mọi thứ đều ổn.</string>
+    <string name="asking_forget_password">Bạn quên mật khẩu?</string>
+    <string name="enter_email">Nhập email của bạn, chúng tôi sẽ gửi cho bạn mã xác nhận</string>
+    <string name="verify_code">Mã xác nhận</string>
+    <string name="enter_code">Nhập mã xác nhận chúng tôi vừa gửi cho bạn qua Email đã đăng ký của bạn</string>
+    <string name="create_new_password">Thay đổi mật khẩu</string>
+    <string name="np_text">Mật khẩu mới của bạn phải khác với mật khẩu cũ</string>
+    <string name="sign_in_error">Email hoặc mật khẩu không chính xác</string>
+    <string name="send_code_error">Email không chính xác</string>
+    <string name="code_error">Mã xác nhận không chính xác</string>
+    <string name="sign_up_title">Đăng ký tài khoản</string>
+    <string name="sign_up_sub">Chúng tôi ở đây để giúp bạn</string>
+    <string name="sign_up_error">Mã xác nhận không chính xác</string>
+    <string name="about_me_default">Dr. Ali Uzair is the top most cardiologist specialist in Crist Hospital in London, UK. He achieved several awards for her wonderful contribution</string>
+    <string name="deposit_note">Lưu ý: Bạn cần đặt cọc trước 50% giá trị phí khám, điều này giúp chúng tôi đảm bạn sẽ thực hiện việc khám bệnh, số tiền này sẽ được hoàn trả nếu bạn hủy lịch hẹn trước 24 giờ trước giờ khám. Mọi chi tiết xem ở phần điều khoản dịch vụ</string>
+</resources>
