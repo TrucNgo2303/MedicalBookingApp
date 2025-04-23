@@ -33,7 +33,7 @@ const login = async (req, res) => {
 
             // Tạo token JWT
             const token = jwt.sign(
-                { authorization_id: user.authorization_id, email: user.email },
+                { authorization_id: user.authorization_id, role: user.role },
                 SECRET_KEY,
                 { expiresIn: '24h' }
             );
