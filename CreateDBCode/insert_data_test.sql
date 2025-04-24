@@ -1,14 +1,9 @@
 -- Tạo 2 tài khoản admin
 INSERT INTO Authorizations (email, password_hash, role) 
 VALUES 
-('admin1@gmail.com', '$2b$10$Eeouzt2ML4SUmZ52JcQp8OsiPlELIDu5eodi0NkC3EYxvKoBiuTzq', 'Admin'),
-('admin2@gmail.com', '$2b$10$Eeouzt2ML4SUmZ52JcQp8OsiPlELIDu5eodi0NkC3EYxvKoBiuTzq', 'Admin');
+('admin@admin.com', '$2b$10$Eeouzt2ML4SUmZ52JcQp8OsiPlELIDu5eodi0NkC3EYxvKoBiuTzq', 'Admin'),
+('letan@gmail.com', '$2b$10$Eeouzt2ML4SUmZ52JcQp8OsiPlELIDu5eodi0NkC3EYxvKoBiuTzq', 'Receptionist');
 
--- Thêm 2 admin vào bảng Admins
-INSERT INTO Admins (full_name, authorization_id) 
-VALUES 
-('Admin 1', 1),
-('Admin 2', 2);
 -- Thêm chuyên khoa
 INSERT INTO Specialists (specialist_name,icon) VALUES
 ('Nội tổng quát','http://res.cloudinary.com/dhmnlnxpd/image/upload/v1742310804/noi_khoa_tong_quat_fxcvjj.png'),

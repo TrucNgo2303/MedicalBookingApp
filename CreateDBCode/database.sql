@@ -31,14 +31,6 @@ CREATE TABLE Doctors (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE Admins (
-    admin_id INT PRIMARY KEY AUTO_INCREMENT,
-    full_name VARCHAR(100) NOT NULL,
-    authorization_id INT,
-    avatar TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 CREATE TABLE Appointments (
     appointment_id INT PRIMARY KEY AUTO_INCREMENT,
     patient_id INT NOT NULL,
@@ -76,7 +68,7 @@ CREATE TABLE Authorizations (
     authorization_id INT PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(255) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    role ENUM('Patient', 'Doctor', 'Admin') NOT NULL
+    role ENUM('Patient', 'Doctor', 'Admin', 'Receptionist') NOT NULL
 );
 
 CREATE TABLE Comments (
@@ -108,8 +100,7 @@ CREATE TABLE Waiting_list (
 	waiting_list_id INT AUTO_INCREMENT PRIMARY KEY,
     patient_id INT NOT NULL,
     doctor_id INT NOT NULL,
-    requested_date DATE,
-    requested_time TIME,
+    requested_datetime DATETIME,
     appointment_id INT DEFAULT NULL,
     status ENUM ('waiting','assigned') DEFAULT 'waiting',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
