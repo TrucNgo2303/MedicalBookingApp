@@ -1,6 +1,6 @@
 const express = require('express');
 require('dotenv').config()
-require('./cron/appointment.cron');
+require('./src/cron/appointment.cron');
 const path = require('path');
 const bodyParser = require('body-parser');
 const authRoute = require('./src/route/auth_route/auth_route')

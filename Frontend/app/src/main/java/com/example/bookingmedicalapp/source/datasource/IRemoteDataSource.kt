@@ -4,6 +4,7 @@ import com.example.bookingmedicalapp.model.*
 import io.reactivex.Observable
 import retrofit2.http.Body
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface IRemoteDataSource {
 
@@ -43,4 +44,22 @@ interface IRemoteDataSource {
 
     fun checkDoctorAppointment(request: DoctorDetailRequest): Observable<BasePatientResponse<List<CheckAppointmentResponse>>>
 
+    //Doctor
+    fun numOfAppointment(): Observable<BaseDoctorResponse<NumOfAppointment>>
+
+    fun todayAppointment(): Observable<BaseDoctorResponse<List<TodayAppointmentResponse>>>
+
+    fun appointmentDetail(request: AppointmentDetailRequest): Observable<AppointmentDetailResponse>
+
+    fun preliminaryDetail(request: AppointmentDetailRequest): Observable<BaseDoctorResponse<PreliminaryDetailResponse>>
+
+    fun addPrescriptions(request: AddPrescriptionsRequest): Observable<NormalResponse>
+
+    fun updatePrescriptions(request: UpdatePrescriptionsRequest): Observable<NormalResponse>
+
+    fun updatePreliminary(request: UpdatePreliminaryRequest): Observable<NormalResponse>
+
+    fun deletePrescriptions(request: PrescriptionsRequest): Observable<NormalResponse>
+
+    fun doctorSchedule(request: AppointmentDateRequest): Observable<BaseDoctorResponse<List<TodayAppointmentResponse>>>
 }

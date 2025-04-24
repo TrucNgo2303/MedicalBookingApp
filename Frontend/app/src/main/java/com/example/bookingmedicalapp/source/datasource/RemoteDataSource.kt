@@ -88,5 +88,41 @@ class RemoteDataSource : IRemoteDataSource {
         return apiServices.checkDoctorAppointment(request)
     }
 
+    override fun numOfAppointment(): Observable<BaseDoctorResponse<NumOfAppointment>> {
+        return apiServices.numOfAppointment()
+    }
+
+    override fun todayAppointment(): Observable<BaseDoctorResponse<List<TodayAppointmentResponse>>> {
+        return apiServices.todayAppointment()
+    }
+
+    override fun appointmentDetail(request: AppointmentDetailRequest): Observable<AppointmentDetailResponse> {
+        return apiServices.appointmentDetail(request)
+    }
+
+    override fun preliminaryDetail(request: AppointmentDetailRequest): Observable<BaseDoctorResponse<PreliminaryDetailResponse>> {
+        return apiServices.preliminaryDetail(request)
+    }
+
+    override fun addPrescriptions(request: AddPrescriptionsRequest): Observable<NormalResponse> {
+        return apiServices.addPrescriptions(request)
+    }
+
+    override fun updatePrescriptions(request: UpdatePrescriptionsRequest): Observable<NormalResponse> {
+        return apiServices.updatePrescriptions(request)
+    }
+
+    override fun updatePreliminary(request: UpdatePreliminaryRequest): Observable<NormalResponse> {
+        return apiServices.updatePreliminary(request)
+    }
+
+    override fun deletePrescriptions(request: PrescriptionsRequest): Observable<NormalResponse> {
+        return apiServices.deletePrescriptions(request)
+    }
+
+    override fun doctorSchedule(request: AppointmentDateRequest): Observable<BaseDoctorResponse<List<TodayAppointmentResponse>>> {
+        return apiServices.doctorSchedule(request)
+    }
+
 
 }

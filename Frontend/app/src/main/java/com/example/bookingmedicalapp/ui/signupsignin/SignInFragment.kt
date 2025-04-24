@@ -90,16 +90,24 @@ internal class SignInFragment : BaseDataBindingFragment<FragmentSignInBinding,Si
                 Constants.token = sharedPref.getToken()
                 Log.d("Api", "Api Response $response")
                 val role = response.role
-                if (role == "Patient"){
-                    val intent =  Intent(requireContext(), BottomNavMainActivity::class.java)
-                    startActivity(intent)
-                }else if(role == "Doctor"){
-                    parentFragmentManager.addFragment(fragment = DoctorHomeFragment.newInstance())
-                }else{
-                    
+                when (role) {
+                    "Patient" -> {
+                        val intent = Intent(requireContext(), BottomNavMainActivity::class.java)
+                        startActivity(intent)
+                        requireActivity().finish() // Kết thúc Activity hiện tại để ngăn quay lại
+                    }
+                    "Doctor" -> {
+                        // Điều hướng đến DoctorHomeFragment
+                        parentFragmentManager.addFragment(fragment = DoctorHomeFragment.newInstance())
+                    }
+                    else -> {
+                        // Xử lý trường hợp role không xác định
+                        Log.d("Api", "Unknown role: $role")
+                        // Có thể hiển thị thông báo lỗi cho người dùng
+                    }
                 }
             }, { throwable ->
-                Log.d("Api", "API Error ${throwable.message}")
+                Log.e("Api", "API Error ${throwable.message}")
 
             })
         )

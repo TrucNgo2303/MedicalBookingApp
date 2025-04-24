@@ -64,14 +64,28 @@ JOIN Patients p ON c.patient_id = p.patient_id
 WHERE c.doctor_id = 1;
 
 SELECT
-	r.reply_id,
-	r.reply_detail,
-	r.created_at,
-	p.full_name AS patient_name,
-	p.avatar AS patient_avatar
-FROM CommentReplies r
-JOIN Patients p ON r.user_id = p.patient_id
-WHERE r.comment_id = 1;
+    p.full_name AS patient_name,
+    d.full_name AS doctor_name,
+    d.specialty,
+    DATE(a.appointment_datetime) AS appointment_date,
+    TIME(a.appointment_datetime) AS appointment_time,
+    a.reason,
+    a.status,
+    a.is_online,
+    a.consultation_fee,
+    EXISTS (
+        SELECT 1 FROM Preliminary_Diagnoses pd
+        WHERE pd.appointment_id = a.appointment_id
+    ) AS has_preliminary_diagnosis,
+    EXISTS (
+        SELECT 1 FROM Prescriptions pr
+        WHERE pr.appointment_id = a.appointment_id
+    ) AS has_prescription
+FROM Appointments a
+JOIN Patients p ON a.patient_id = p.patient_id
+JOIN Doctors d ON a.doctor_id = d.doctor_id
+WHERE a.appointment_id = 1;
 
-SELECT patient_id FROM Patients WHERE authorization_id = 18
+DELETE FROM Preliminary_Diagnoses WHERE appointment_id = 1;
+
 

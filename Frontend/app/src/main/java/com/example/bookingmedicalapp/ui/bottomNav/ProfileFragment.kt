@@ -1,8 +1,10 @@
 package com.example.bookingmedicalapp.ui.bottomNav
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -12,6 +14,7 @@ import com.example.bookingmedicalapp.base.BaseDataBindingFragment
 import com.example.bookingmedicalapp.databinding.FragmentProfileBinding
 import com.example.bookingmedicalapp.model.ProfileItem
 import com.example.bookingmedicalapp.source.repository.RemoteRepository
+import com.example.bookingmedicalapp.ui.LoadingActivity
 import com.example.bookingmedicalapp.ui.signupsignin.SignInFragment
 import com.example.bookingmedicalapp.utils.TokenAction
 import com.example.bookingmedicalapp.utils.addWithNavFragment
@@ -68,7 +71,13 @@ internal class ProfileFragment : BaseDataBindingFragment<FragmentProfileBinding,
                 "Đăng xuất" -> {
                     val sharedPref = TokenAction(requireContext())
                     sharedPref.clearToken()
-                    parentFragmentManager.addWithNavFragment(fragment = SignInFragment.newInstance())
+                    // Xóa toàn bộ back stack
+                    parentFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                    val intent = Intent(requireContext(), LoadingActivity::class.java) // Thay bằng Activity chứa SignInFragment
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                    requireActivity().finish()
+                    //parentFragmentManager.addWithNavFragment(fragment = SignInFragment.newInstance())
                 }
                 else -> Toast.makeText(context, "${item.title} Clicked", Toast.LENGTH_SHORT).show()
             }

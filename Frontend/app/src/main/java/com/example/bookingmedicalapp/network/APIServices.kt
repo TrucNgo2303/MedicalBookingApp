@@ -3,9 +3,7 @@ package com.example.bookingmedicalapp.network
 
 import com.example.bookingmedicalapp.model.*
 import io.reactivex.Observable
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
+import retrofit2.http.*
 
 interface APIServices {
 
@@ -61,5 +59,33 @@ interface APIServices {
 
     @POST("/patient/check-doctor-appointment")
     fun checkDoctorAppointment(@Body request: DoctorDetailRequest): Observable<BasePatientResponse<List<CheckAppointmentResponse>>>
+
+    //Doctor
+    @GET("/doctor/number-of-appointment-today")
+    fun numOfAppointment(): Observable<BaseDoctorResponse<NumOfAppointment>>
+
+    @GET("/doctor/today-appointment")
+    fun todayAppointment(): Observable<BaseDoctorResponse<List<TodayAppointmentResponse>>>
+
+    @POST("/doctor/appointment-detail")
+    fun appointmentDetail(@Body request: AppointmentDetailRequest): Observable<AppointmentDetailResponse>
+
+    @POST("/doctor/preliminary-and-prescriptions")
+    fun preliminaryDetail(@Body request: AppointmentDetailRequest): Observable<BaseDoctorResponse<PreliminaryDetailResponse>>
+
+    @POST("/doctor/add-prescriptions")
+    fun addPrescriptions(@Body request: AddPrescriptionsRequest): Observable<NormalResponse>
+
+    @POST("/doctor/update-prescriptions")
+    fun updatePrescriptions(@Body request: UpdatePrescriptionsRequest): Observable<NormalResponse>
+
+    @POST("/doctor/update-preliminary")
+    fun updatePreliminary(@Body request: UpdatePreliminaryRequest): Observable<NormalResponse>
+
+    @HTTP(method = "DELETE", path = "/doctor/delete-prescriptions", hasBody = true)
+    fun deletePrescriptions(@Body request: PrescriptionsRequest): Observable<NormalResponse>
+
+    @POST("/doctor/doctor-schedule")
+    fun doctorSchedule(@Body request: AppointmentDateRequest): Observable<BaseDoctorResponse<List<TodayAppointmentResponse>>>
 
 }

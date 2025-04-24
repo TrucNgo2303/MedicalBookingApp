@@ -41,5 +41,8 @@ class MainViewModel: ViewModel() {
     var dateChoose: String? = null
     var noteBill: String? = null
 
+    //For Doctor Appointment
+    var save_appointment_id: Int? = null
+
 
 }

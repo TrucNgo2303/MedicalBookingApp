@@ -74,7 +74,7 @@ const today_appointment = (req, res) => {
         const todayVN = moment().tz("Asia/Ho_Chi_Minh").format("YYYY-MM-DD");
 
         const appointmentQuery = `
-            SELECT ap.appointment_id, ap.doctor_id, ap.patient_id, ap.appointment_datetime, ap.status, p.avatar, p.full_name
+            SELECT ap.appointment_id, ap.doctor_id, ap.patient_id, ap.appointment_datetime, ap.status, p.avatar, p.full_name, ap.is_online
             FROM Appointments ap
             JOIN Patients p ON ap.patient_id = p.patient_id
             WHERE ap.doctor_id = ? AND DATE(ap.appointment_datetime) = ?

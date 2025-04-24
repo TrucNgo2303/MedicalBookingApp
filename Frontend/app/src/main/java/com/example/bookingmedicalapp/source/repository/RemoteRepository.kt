@@ -6,6 +6,7 @@ import com.example.bookingmedicalapp.source.datasource.RemoteDataSource
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import retrofit2.http.Path
 
 class RemoteRepository : IRemoteDataSource {
     private val dataSource = RemoteDataSource.getInstance()
@@ -110,6 +111,51 @@ class RemoteRepository : IRemoteDataSource {
 
     override fun checkDoctorAppointment(request: DoctorDetailRequest): Observable<BasePatientResponse<List<CheckAppointmentResponse>>> {
         return dataSource.checkDoctorAppointment(request)
+            .applySchedulers()
+    }
+
+    override fun numOfAppointment(): Observable<BaseDoctorResponse<NumOfAppointment>> {
+        return dataSource.numOfAppointment()
+            .applySchedulers()
+    }
+
+    override fun todayAppointment(): Observable<BaseDoctorResponse<List<TodayAppointmentResponse>>> {
+        return dataSource.todayAppointment()
+            .applySchedulers()
+    }
+
+    override fun appointmentDetail(request: AppointmentDetailRequest): Observable<AppointmentDetailResponse> {
+        return dataSource.appointmentDetail(request)
+            .applySchedulers()
+    }
+
+    override fun preliminaryDetail(request: AppointmentDetailRequest): Observable<BaseDoctorResponse<PreliminaryDetailResponse>> {
+        return dataSource.preliminaryDetail(request)
+            .applySchedulers()
+    }
+
+    override fun addPrescriptions(request: AddPrescriptionsRequest): Observable<NormalResponse> {
+        return dataSource.addPrescriptions(request)
+            .applySchedulers()
+    }
+
+    override fun updatePrescriptions(request: UpdatePrescriptionsRequest): Observable<NormalResponse> {
+        return dataSource.updatePrescriptions(request)
+            .applySchedulers()
+    }
+
+    override fun updatePreliminary(request: UpdatePreliminaryRequest): Observable<NormalResponse> {
+        return dataSource.updatePreliminary(request)
+            .applySchedulers()
+    }
+
+    override fun deletePrescriptions(request: PrescriptionsRequest): Observable<NormalResponse> {
+        return dataSource.deletePrescriptions(request)
+            .applySchedulers()
+    }
+
+    override fun doctorSchedule(request: AppointmentDateRequest): Observable<BaseDoctorResponse<List<TodayAppointmentResponse>>> {
+        return dataSource.doctorSchedule(request)
             .applySchedulers()
     }
 
