@@ -28,6 +28,7 @@ CREATE TABLE Doctors (
     authorization_id INT,
     avatar TEXT,
     patient_count INT NOT NULL DEFAULT 0,
+    status ENUM('Inative', 'Active') DEFAULT 'Active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -162,7 +163,6 @@ ALTER TABLE Doctors ADD FOREIGN KEY (specialist_id) REFERENCES Specialists(speci
 ALTER TABLE Notifications ADD FOREIGN KEY (recipient_id) REFERENCES Patients(patient_id) ON DELETE CASCADE;
 ALTER TABLE Doctors ADD FOREIGN KEY (authorization_id) REFERENCES Authorizations(authorization_id);
 ALTER TABLE Patients ADD FOREIGN KEY (authorization_id) REFERENCES Authorizations(authorization_id);
-ALTER TABLE Admins ADD FOREIGN KEY (authorization_id) REFERENCES Authorizations(authorization_id);
 ALTER TABLE Comments ADD FOREIGN KEY (patient_id) REFERENCES Patients(patient_id) ON DELETE CASCADE;
 ALTER TABLE Comments ADD FOREIGN KEY (doctor_id) REFERENCES Doctors(doctor_id) ON DELETE CASCADE;
 ALTER TABLE CommentReplies ADD FOREIGN KEY (comment_id) REFERENCES Comments(comment_id) ON DELETE CASCADE;

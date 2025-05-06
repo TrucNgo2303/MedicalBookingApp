@@ -87,3 +87,17 @@ data class SpecialistResponse(
     val consultation_fee: String?
 )
 
+data class StatusRequest(
+    val status: String
+)
+
+data class StatusResponse(
+    val appointment_id: Int,
+    val doctor_id: Int,
+    val appointment_datetime: String,
+    val doctor_avatar: String,
+    val doctor_name: String,
+    val specialist: String,
+    val consultation_fee: String,
+)
+

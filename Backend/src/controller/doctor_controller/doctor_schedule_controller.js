@@ -25,6 +25,7 @@ const doctor_schedule = async (req, res) => {
         INNER JOIN patients p ON p.patient_id = a.patient_id
         WHERE d.authorization_id = ?
         AND DATE(a.appointment_datetime) = ?
+        AND a.status != 'Cancelled'
         ORDER BY a.appointment_datetime ASC
     `
 

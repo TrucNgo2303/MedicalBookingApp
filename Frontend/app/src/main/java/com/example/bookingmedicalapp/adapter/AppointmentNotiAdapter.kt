@@ -1,20 +1,22 @@
 package com.example.bookingmedicalapp.adapter
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.bookingmedicalapp.R
 import com.example.bookingmedicalapp.model.AppointmentNotiItem
+import java.text.DecimalFormat
 
 class AppointmentNotiAdapter(
     private val items: List<AppointmentNotiItem>,
     private val message: String,
-    private val isEnabled: Boolean // Thêm biến boolean
+    private val messageColor: Int
 ) : RecyclerView.Adapter<AppointmentNotiAdapter.AppointmentNotiViewHolder>() {
 
     inner class AppointmentNotiViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -25,8 +27,6 @@ class AppointmentNotiAdapter(
         val specialist: AppCompatTextView = view.findViewById(R.id.tv_specialist)
         val fee: AppCompatTextView = view.findViewById(R.id.tv_fee)
         val message: AppCompatTextView = view.findViewById(R.id.tv_message)
-        val btnCancel: AppCompatButton = view.findViewById(R.id.btn_cancel)
-        val btnReschedule: AppCompatButton = view.findViewById(R.id.btn_reschedule)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppointmentNotiViewHolder {
@@ -39,26 +39,34 @@ class AppointmentNotiAdapter(
 
     override fun onBindViewHolder(holder: AppointmentNotiViewHolder, position: Int) {
         val item = items[position]
+
         holder.date.text = item.date
         holder.time.text = item.time
-        holder.avatar.setImageResource(item.avatar)
+
+        // Load ảnh avatar với Glide (ảnh tròn + ảnh mặc định khi lỗi)
+        Glide.with(holder.itemView.context)
+            .load(item.avatar)
+            .placeholder(R.drawable.default_avatar)
+            .error(R.drawable.default_avatar)
+            .transform(CircleCrop())
+            .into(holder.avatar)
+
         holder.name.text = item.name
         holder.specialist.text = item.specialist
-        holder.fee.text = item.fee
+        holder.fee.text = formatFee(item.fee)
         holder.message.text = message
+        holder.message.setTextColor(ContextCompat.getColor(holder.itemView.context, messageColor))
+    }
 
-        if (!isEnabled) {
-            holder.btnCancel.visibility = View.GONE
+    private fun formatFee(fee: String): String {
+        // Chuyển fee từ String sang Double
+        val feeDouble = fee.toDoubleOrNull()
 
-            val layoutParams = holder.btnReschedule.layoutParams as ViewGroup.MarginLayoutParams
-            layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
-            layoutParams.marginStart = 8.dpToPx(holder.itemView.context)
-            layoutParams.marginEnd = 8.dpToPx(holder.itemView.context)
-            holder.btnReschedule.layoutParams = layoutParams
+        return if (feeDouble != null) {
+            val decimalFormat = DecimalFormat("#,###.##")
+            decimalFormat.format(feeDouble)
+        } else {
+            fee
         }
     }
-    private fun Int.dpToPx(context: Context): Int {
-        return (this * context.resources.displayMetrics.density).toInt()
-    }
-
 }

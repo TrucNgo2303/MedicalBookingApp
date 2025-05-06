@@ -29,6 +29,10 @@ class MainViewModel: ViewModel() {
     var specialist_id_1 = MutableLiveData<Int?>()
     var specialist_id_2 = MutableLiveData<Int?>()
     var specialist_id_3 = MutableLiveData<Int?>()
+    var specialist_id_4 = MutableLiveData<Int?>()
+    var specialist_id_5 = MutableLiveData<Int?>()
+    var specialist_id_6 = MutableLiveData<Int?>()
+    var specialist_id_7 = MutableLiveData<Int?>()
 
     //For Book Appointment
     var doctor_name: String? = null

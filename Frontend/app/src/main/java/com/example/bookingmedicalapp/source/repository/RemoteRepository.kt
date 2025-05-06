@@ -74,6 +74,11 @@ class RemoteRepository : IRemoteDataSource {
             .applySchedulers()
     }
 
+    override fun appointmentStatus(request: StatusRequest): Observable<BasePatientResponse<List<StatusResponse>>> {
+        return dataSource.appointmentStatus(request)
+            .applySchedulers()
+    }
+
     override fun doctorDetail(request: DoctorDetailRequest): Observable<BasePatientResponse<DoctorDetailResponse>> {
         return  dataSource.doctorDetail(request)
             .applySchedulers()
@@ -156,6 +161,15 @@ class RemoteRepository : IRemoteDataSource {
 
     override fun doctorSchedule(request: AppointmentDateRequest): Observable<BaseDoctorResponse<List<TodayAppointmentResponse>>> {
         return dataSource.doctorSchedule(request)
+            .applySchedulers()
+    }
+
+    override fun checkDoctorSchedule(request: CheckDoctorRequest): Observable<BaseDoctorResponse<List<CheckDoctorResponse>>> {
+        return dataSource.checkDoctorSchedule(request)
+    }
+
+    override fun addWaiting(request: AddWaitingRequest): Observable<NormalResponse> {
+        return dataSource.addWaiting(request)
             .applySchedulers()
     }
 

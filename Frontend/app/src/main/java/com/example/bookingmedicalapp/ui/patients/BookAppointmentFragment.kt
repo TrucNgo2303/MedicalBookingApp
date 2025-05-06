@@ -84,6 +84,8 @@ internal class BookAppointmentFragment : BaseDataBindingFragment<FragmentBookApp
         Glide.with(mBinding.root.context)
             .load(mainViewModel.doctor_avatar)
             .into(mBinding.imvAvatar)
+        Log.d("DeviceLocale", Locale.getDefault().toString())
+        Log.d("DeviceTimeZone", TimeZone.getDefault().id)
     }
 
     @SuppressLint("NotifyDataSetChanged")

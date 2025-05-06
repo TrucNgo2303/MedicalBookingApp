@@ -16,5 +16,6 @@ router.post('/update-prescriptions', verify.verifyToken, doctorAppointmentContro
 router.post('/update-preliminary', verify.verifyToken, doctorAppointmentController.update_preliminary)
 router.delete('/delete-prescriptions', verify.verifyToken, doctorAppointmentController.delete_prescriptions)
 router.post('/doctor-schedule', verify.verifyToken, doctorScheduleController.doctor_schedule)
+router.post('/number-of-waiting', verify.verifyToken, doctorHomeController.number_of_waiting)
 
 module.exports = router;

@@ -2,7 +2,10 @@ package com.example.bookingmedicalapp.ui.patients
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.bookingmedicalapp.R
@@ -82,10 +85,10 @@ internal class PatientHomeFragment : BaseDataBindingFragment<FragmentPatientHome
 
                 // Cập nhật danh sách chuyên khoa
                 val specialistTextView = listOf(
-                    mBinding.tvSpecialist1, mBinding.tvSpecialist2, mBinding.tvSpecialist3
+                    mBinding.tvSpecialist1, mBinding.tvSpecialist2, mBinding.tvSpecialist3, mBinding.tvSpecialist4, mBinding.tvSpecialist5, mBinding.tvSpecialist6, mBinding.tvSpecialist7
                 )
                 val specialistImageView = listOf(
-                    mBinding.imvSpecialist1, mBinding.imvSpecialist2, mBinding.imvSpecialist3
+                    mBinding.imvSpecialist1, mBinding.imvSpecialist2, mBinding.imvSpecialist3, mBinding.imvSpecialist4, mBinding.imvSpecialist5, mBinding.imvSpecialist6, mBinding.imvSpecialist7
                 )
                 specialistList.forEachIndexed { index, specialist ->
                     if (index < specialistTextView.size) {
@@ -97,27 +100,20 @@ internal class PatientHomeFragment : BaseDataBindingFragment<FragmentPatientHome
                             0 -> mainViewModel.specialist_id_1.postValue(specialist.specialist_id)
                             1 -> mainViewModel.specialist_id_2.postValue(specialist.specialist_id)
                             2 -> mainViewModel.specialist_id_3.postValue(specialist.specialist_id)
+                            3 -> mainViewModel.specialist_id_4.postValue(specialist.specialist_id)
+                            4 -> mainViewModel.specialist_id_5.postValue(specialist.specialist_id)
+                            5 -> mainViewModel.specialist_id_6.postValue(specialist.specialist_id)
+                            6 -> mainViewModel.specialist_id_7.postValue(specialist.specialist_id)
                         }
                     }
                 }
-                mBinding.cvSpecialist1.setOnClickListener {
-                    mainViewModel.specialist_id_1.observe(viewLifecycleOwner) { specialist ->
-                        mainViewModel.specialistId.postValue(specialist)
-                    }
-                    parentFragmentManager.addWithNavFragment(fragment = SpecialistDetailFragment.newInstance())
-                }
-                mBinding.cvSpecialist2.setOnClickListener {
-                    mainViewModel.specialist_id_2.observe(viewLifecycleOwner) { specialist ->
-                        mainViewModel.specialistId.postValue(specialist)
-                    }
-                    parentFragmentManager.addWithNavFragment(fragment = SpecialistDetailFragment.newInstance())
-                }
-                mBinding.cvSpecialist3.setOnClickListener {
-                    mainViewModel.specialist_id_3.observe(viewLifecycleOwner) { specialist ->
-                        mainViewModel.specialistId.postValue(specialist)
-                    }
-                    parentFragmentManager.addWithNavFragment(fragment = SpecialistDetailFragment.newInstance())
-                }
+                setupSpecialistClick(mBinding.cvSpecialist1, mainViewModel.specialist_id_1)
+                setupSpecialistClick(mBinding.cvSpecialist2, mainViewModel.specialist_id_2)
+                setupSpecialistClick(mBinding.cvSpecialist3, mainViewModel.specialist_id_3)
+                setupSpecialistClick(mBinding.cvSpecialist4, mainViewModel.specialist_id_1)
+                setupSpecialistClick(mBinding.cvSpecialist5, mainViewModel.specialist_id_2)
+                setupSpecialistClick(mBinding.cvSpecialist6, mainViewModel.specialist_id_3)
+                setupSpecialistClick(mBinding.cvSpecialist7, mainViewModel.specialist_id_3)
 
                 // Cập nhật danh sách bác sĩ
                 val nameTextViews = listOf(
@@ -197,6 +193,14 @@ internal class PatientHomeFragment : BaseDataBindingFragment<FragmentPatientHome
                 }
             })
         )
+    }
+    private fun setupSpecialistClick(cardView: View, specialistLiveData: MutableLiveData<Int?>) {
+        cardView.setOnClickListener {
+            specialistLiveData.observe(viewLifecycleOwner) { specialist ->
+                mainViewModel.specialistId.postValue(specialist)
+            }
+            parentFragmentManager.addWithNavFragment(fragment = SpecialistDetailFragment.newInstance())
+        }
     }
 
 

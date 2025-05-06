@@ -36,6 +36,9 @@ interface APIServices {
     @GET("/patient/search-result")
     fun searchResult(): Observable<BasePatientResponse<List<SearchResultBody>>>
 
+    @POST("/patient/get-appointment-status")
+    fun appointmentStatus(@Body request: StatusRequest): Observable<BasePatientResponse<List<StatusResponse>>>
+
     @POST("/patient/doctor-detail")
     fun doctorDetail(@Body request: DoctorDetailRequest): Observable<BasePatientResponse<DoctorDetailResponse>>
 
@@ -87,5 +90,15 @@ interface APIServices {
 
     @POST("/doctor/doctor-schedule")
     fun doctorSchedule(@Body request: AppointmentDateRequest): Observable<BaseDoctorResponse<List<TodayAppointmentResponse>>>
+
+    //Receptionist
+//    @GET("/receptionist/get-all-appointment-today")
+//    fun receptionistAppointment(): Observable<BaseDoctorResponse<>>
+
+    @POST("/receptionist/check-doctor-schedule")
+    fun checkDoctorSchedule(@Body request: CheckDoctorRequest): Observable<BaseDoctorResponse<List<CheckDoctorResponse>>>
+
+    @POST("/receptionist/add-waiting")
+    fun addWaiting(@Body request: AddWaitingRequest) : Observable<NormalResponse>
 
 }

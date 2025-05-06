@@ -1,4 +1,5 @@
 const connection = require('../../config/database')
+const moment = require('moment-timezone');
 require('dotenv').config()
 
 const patient_info = async (req, res) => {
@@ -36,7 +37,7 @@ const patient_info = async (req, res) => {
 
 
 const specialists = async (req, res) => {
-    const sql = `SELECT specialist_id, specialist_name, icon FROM Specialists LIMIT 3`
+    const sql = `SELECT specialist_id, specialist_name, icon FROM Specialists`
 
     connection.query(sql, (err, result) => {
         if (err) {
@@ -126,10 +127,68 @@ const search_result = async (req, res) => {
 };
 
 
+const get_appointment_status = (req, res) => {
+    const { authorization_id } = req.user;
+    const { status } = req.body;
+
+    // Lấy patient_id từ authorization_id
+    const getPatientQuery = `
+        SELECT patient_id, full_name, avatar 
+        FROM Patients 
+        WHERE authorization_id = ?
+    `;
+
+    connection.query(getPatientQuery, [authorization_id], (err, patientResult) => {
+        if (err) return res.status(500).json({ message: 'Lỗi truy vấn patient', error: err });
+        if (patientResult.length === 0) {
+            return res.status(404).json({ message: 'Không tìm thấy bệnh nhân' });
+        }
+
+        const patient_id = patientResult[0].patient_id;
+
+        // Truy vấn danh sách cuộc hẹn và thay patient_name, patient_avatar bằng doctor_name, doctor_avatar
+        const appointmentQuery = `
+            SELECT 
+                a.appointment_id,
+                a.doctor_id,
+                a.appointment_datetime,
+                d.avatar AS doctor_avatar,      -- Thay patient_avatar thành doctor_avatar
+                d.full_name AS doctor_name,     -- Thay patient_name thành doctor_name
+                s.specialist_name AS specialist,
+                a.consultation_fee
+            FROM Appointments a
+            JOIN Doctors d ON a.doctor_id = d.doctor_id
+            LEFT JOIN Specialists s ON d.specialist_id = s.specialist_id
+            WHERE a.patient_id = ? AND a.status = ?
+            ORDER BY a.appointment_datetime DESC
+        `;
+
+        connection.query(
+            appointmentQuery,
+            [patient_id, status],
+            (err, appointmentResults) => {
+                if (err) return res.status(500).json({ message: 'Lỗi truy vấn appointments', error: err });
+
+                // Chỉnh sửa appointment_datetime theo giờ Việt Nam (GMT+7)
+                appointmentResults.forEach(appointment => {
+                    appointment.appointment_datetime = moment(appointment.appointment_datetime)
+                        .tz('Asia/Ho_Chi_Minh', true) // Chuyển đổi về múi giờ Việt Nam
+                        .format('YYYY-MM-DD HH:mm:ss'); // Định dạng thời gian
+                });
+
+                return res.status(200).json({
+                    message: 'Success',
+                    data: appointmentResults
+                });
+            }
+        );
+    });
+};
 
 module.exports = {
     patient_info,
     specialists,
     top_doctors,
-    search_result
+    search_result,
+    get_appointment_status
 }

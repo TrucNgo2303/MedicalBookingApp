@@ -23,5 +23,6 @@
     <color name="status_confirmed">#0000FF</color>
     <color name="status_completed">#00FF00</color>
     <color name="status_cancelled">#FF0000</color>
+    <color name="reminder">#4894FE</color>
 
 </resources>

@@ -23,5 +23,6 @@ router.post('/add-comment', verify.verifyToken, patientCommentController.add_com
 router.post('/add-reply', verify.verifyToken, patientCommentController.add_reply)
 router.post('/create-appointment', verify.verifyToken, patientAppointmentController.create_appointment)
 router.post('/check-doctor-appointment', verify.verifyToken, patientAppointmentController.check_doctor_appointment)
+router.post('/get-appointment-status', verify.verifyToken, patientHomeController.get_appointment_status)
 
 module.exports = router;

@@ -18,6 +18,7 @@ import com.example.bookingmedicalapp.source.repository.RemoteRepository
 import com.example.bookingmedicalapp.ui.bottomNav.BottomNavMainActivity
 import com.example.bookingmedicalapp.ui.doctors.DoctorHomeFragment
 import com.example.bookingmedicalapp.ui.patients.PatientHomeFragment
+import com.example.bookingmedicalapp.ui.receptionist.ReceptionistHomeFragment
 import com.example.bookingmedicalapp.utils.TokenAction
 import com.example.bookingmedicalapp.utils.addFragment
 import io.reactivex.disposables.CompositeDisposable
@@ -99,6 +100,9 @@ internal class SignInFragment : BaseDataBindingFragment<FragmentSignInBinding,Si
                     "Doctor" -> {
                         // Điều hướng đến DoctorHomeFragment
                         parentFragmentManager.addFragment(fragment = DoctorHomeFragment.newInstance())
+                    }
+                    "Receptionist" -> {
+                        parentFragmentManager.addFragment(fragment = ReceptionistHomeFragment.newInstance())
                     }
                     else -> {
                         // Xử lý trường hợp role không xác định

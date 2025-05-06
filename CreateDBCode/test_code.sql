@@ -89,3 +89,15 @@ WHERE a.appointment_id = 1;
 DELETE FROM Preliminary_Diagnoses WHERE appointment_id = 1;
 
 
+SELECT d.full_name
+FROM Doctors d
+JOIN Specialists s ON d.specialist_id = s.specialist_id
+WHERE s.specialist_name = 'Nội tổng quát'
+  AND d.doctor_id NOT IN (
+    SELECT a.doctor_id
+    FROM Appointments a
+    WHERE a.appointment_datetime = '2025-04-25 10:00:00'
+      AND a.status != 'Cancelled'
+  );
+
+
