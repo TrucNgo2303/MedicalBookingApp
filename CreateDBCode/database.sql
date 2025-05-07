@@ -41,6 +41,7 @@ CREATE TABLE Appointments (
     reason TEXT,
     is_deposit BOOLEAN DEFAULT TRUE,
     consultation_fee DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    is_paid  BOOLEAN DEFAULT FALSE,
     is_online BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -131,28 +132,58 @@ CREATE TABLE Prescriptions (
 );
 CREATE TABLE Prescription_Details (
     detail_id INT AUTO_INCREMENT PRIMARY KEY,
+    medicine_id INT,
     prescription_id INT NOT NULL,
-    medicine_name VARCHAR(255) NOT NULL,
+    tablet_usage INT NOT NULL,
     dosage VARCHAR(100) NOT NULL,
     usage_instruction TEXT NOT NULL,
     duration INT NOT NULL COMMENT 'Số ngày sử dụng',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE Medicines (
+    medicine_id INT AUTO_INCREMENT PRIMARY KEY,
+    medicine_name VARCHAR(255) NOT NULL,
+    dosage VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 DELIMITER //
--- Tự động đếm bệnh nhân--
-CREATE TRIGGER update_patient_count
+
+-- Trigger cho khi insert
+CREATE TRIGGER update_patient_count_insert
 AFTER INSERT ON Appointments
 FOR EACH ROW
 BEGIN
-    UPDATE Doctors
-    SET patient_count = (
-        SELECT COUNT(DISTINCT patient_id)
-        FROM Appointments
-        WHERE doctor_id = NEW.doctor_id
-    )
-    WHERE doctor_id = NEW.doctor_id;
-END //
+    IF NEW.status = 'Completed' THEN
+        UPDATE Doctors
+        SET patient_count = (
+            SELECT COUNT(*)
+            FROM Appointments
+            WHERE doctor_id = NEW.doctor_id
+              AND status = 'Completed'
+        )
+        WHERE doctor_id = NEW.doctor_id;
+    END IF;
+END;
+
+-- Trigger cho khi update từ trạng thái khác thành Completed
+CREATE TRIGGER update_patient_count_update
+AFTER UPDATE ON Appointments
+FOR EACH ROW
+BEGIN
+    IF NEW.status = 'Completed' AND OLD.status != 'Completed' THEN
+        UPDATE Doctors
+        SET patient_count = (
+            SELECT COUNT(*)
+            FROM Appointments
+            WHERE doctor_id = NEW.doctor_id
+              AND status = 'Completed'
+        )
+        WHERE doctor_id = NEW.doctor_id;
+    END IF;
+END;
+//
 
 DELIMITER ;
 
@@ -178,3 +209,4 @@ ALTER TABLE Prescriptions ADD FOREIGN KEY (appointment_id) REFERENCES Appointmen
 ALTER TABLE Prescriptions ADD FOREIGN KEY (doctor_id) REFERENCES Doctors(doctor_id) ON DELETE CASCADE;
 ALTER TABLE Prescriptions ADD FOREIGN KEY (patient_id) REFERENCES Patients(patient_id) ON DELETE CASCADE;
 ALTER TABLE Prescription_Details ADD FOREIGN KEY (prescription_id) REFERENCES Prescriptions(prescription_id) ON DELETE CASCADE;
+ALTER TABLE Prescription_Details ADD FOREIGN KEY (medicine_id) REFERENCES Medicines(medicine_id) ON DELETE CASCADE;
