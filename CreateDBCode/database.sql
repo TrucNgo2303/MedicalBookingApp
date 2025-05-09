@@ -134,17 +134,16 @@ CREATE TABLE Prescription_Details (
     detail_id INT AUTO_INCREMENT PRIMARY KEY,
     medicine_id INT,
     prescription_id INT NOT NULL,
-    tablet_usage INT NOT NULL,
-    dosage VARCHAR(100) NOT NULL,
-    usage_instruction TEXT NOT NULL,
-    duration INT NOT NULL COMMENT 'Số ngày sử dụng',
+    quantity VARCHAR(100) NOT NULL,
+    pills_per_day INT NOT NULL,
+    duration VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Medicines (
     medicine_id INT AUTO_INCREMENT PRIMARY KEY,
     medicine_name VARCHAR(255) NOT NULL,
-    dosage VARCHAR(100),
+    usage_instruction VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
