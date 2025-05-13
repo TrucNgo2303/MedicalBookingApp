@@ -1,6 +1,6 @@
 import tkinter as tk
 import requests
-from constants import base_url, appointment_id
+from constants import base_url
 from tkinter import messagebox
 from datetime import datetime
 
@@ -15,7 +15,6 @@ def run_customer_online():
 
     def filter_appointments():
         search_text = search_entry.get().strip()  # dùng trực tiếp Entry thay vì StringVar
-        print(f"[DEBUG] SĐT nhập vào: {search_text}")
         for widget in scroll_frame.winfo_children():
             widget.destroy()
 
@@ -79,12 +78,20 @@ def run_customer_online():
 
         # Bắt sự kiện click để lưu appointment_id và chuyển màn hình
         def on_click(event):
-            import constants
-            constants.appointment_id = app["appointment_id"]
-            root.destroy()
+            import session
+            appointment_id_clicked = app["appointment_id"]
+            session.appointment_id = appointment_id_clicked
+            print(f"[DEBUG] appointment_id: {session.appointment_id}")
 
-            from receptionist import appointment_detail
-            appointment_detail.run_detail()
+            def open_detail():
+                from receptionist import appointment_detail
+                print(f"[DEBUG] appointment_id (trước run_detail): {session.appointment_id}")
+                appointment_detail.run_detail()
+
+            # Delay nhỏ đảm bảo session cập nhật xong
+            root.after(200, open_detail)
+            root.after(300, root.destroy)  # đóng sau khi mở chi tiết
+
 
         frame.bind("<Button-1>", on_click)
         for child in frame.winfo_children():
@@ -127,9 +134,12 @@ def run_customer_online():
         canvas.configure(scrollregion=canvas.bbox("all"))
     scroll_frame.bind("<Configure>", resize_canvas)
 
-    # Nút quay lại
+    def back(current_window):
+        from receptionist.receptionist_home import run_receptionist_home
+        current_window.destroy()
+        run_receptionist_home()
     tk.Button(root, text="Quay lại", font=("Arial", 14), bg="#9E9E9E", fg="white",
-              command=root.destroy).place(relx=1.0, rely=1.0, x=-20, y=-20, anchor="se")
+          command=lambda: back(root)).place(relx=1.0, rely=1.0, x=-20, y=-20, anchor="se")
 
     # Gọi API
     try:

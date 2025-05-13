@@ -1,9 +1,10 @@
 import tkinter as tk
 from receptionist.customer_online import run_customer_online
+from receptionist.customer_offline import run_customer_offline
 
 def run_receptionist_home():
     root = tk.Tk()
-    root.title("Admin Home")
+    root.title("Receptionist Home")
 
     # Giao diện toàn màn hình
     root.attributes('-fullscreen', True)
@@ -16,13 +17,19 @@ def run_receptionist_home():
     center_frame.pack(expand=True)
 
     # Nút Khách hàng trực tuyến
+    def come_customer_online():
+        root.destroy()
+        run_customer_online()
     btn_online = tk.Button(center_frame, text="Khách hàng trực tuyến", font=("Arial", 20, "bold"),
-                        width=25, height=3, bg="#2196F3", fg="white", command=run_customer_online)
+                        width=25, height=3, bg="#2196F3", fg="white", command=come_customer_online)
     btn_online.pack(pady=20)
 
     # Nút Khách hàng trực tiếp
+    def come_customer_offline():
+        root.destroy()
+        run_customer_offline()
     btn_offline = tk.Button(center_frame, text="Khách hàng trực tiếp", font=("Arial", 20, "bold"),
-                            width=25, height=3, bg="#4CAF50", fg="white")
+                            width=25, height=3, bg="#4CAF50", fg="white", command=come_customer_offline)
     btn_offline.pack(pady=20)
 
     # Nút X và - ở góc trên phải
