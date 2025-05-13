@@ -106,7 +106,6 @@ const preliminary_and_prescriptions = (req, res) => {
                 }
 
                 if (prescriptions.length === 0) {
-                    // Không có đơn thuốc
                     return res.status(200).json({
                         message: "Success",
                         data: {
@@ -119,29 +118,28 @@ const preliminary_and_prescriptions = (req, res) => {
                     });
                 }
 
-                // Lấy chi tiết của tất cả các đơn thuốc
                 const prescriptionDetailsPromises = prescriptions.map(prescription => {
                     return new Promise((resolve, reject) => {
                         const queryDetails = `
-                            SELECT detail_id, prescription_id, medicine_name, dosage, usage_instruction, duration
-                            FROM Prescription_Details
-                            WHERE prescription_id = ?
+                            SELECT 
+                                pd.detail_id, pd.prescription_id, 
+                                pd.quantity, pd.pills_per_day, pd.doses_per_day,
+                                m.medicine_name, m.usage_instruction
+                            FROM Prescription_Details pd
+                            JOIN Medicines m ON pd.medicine_id = m.medicine_id
+                            WHERE pd.prescription_id = ?
                         `;
+
                         connection.query(queryDetails, [prescription.prescription_id], (err, details) => {
-                            if (err) {
-                                return reject(err);
-                            }
+                            if (err) return reject(err);
                             resolve(details);
                         });
                     });
                 });
 
-                // Chờ tất cả các truy vấn chi tiết đơn thuốc hoàn tất
                 Promise.all(prescriptionDetailsPromises)
                     .then(allDetails => {
-                        // Gộp tất cả chi tiết đơn thuốc vào một mảng
                         const prescriptionDetails = allDetails.flat();
-
                         res.status(200).json({
                             message: "Success",
                             data: {
@@ -149,7 +147,7 @@ const preliminary_and_prescriptions = (req, res) => {
                                 preliminary_diagnosis: preliminaryDiagnoses[0]?.preliminary_diagnosis || null,
                                 final_conclusion: finalConclusions[0]?.final_conclusion || null,
                                 recommendations: finalConclusions[0]?.recommendations || null,
-                                prescriptionDetails: prescriptionDetails || []
+                                prescriptionDetails: prescriptionDetails
                             }
                         });
                     })
@@ -163,10 +161,10 @@ const preliminary_and_prescriptions = (req, res) => {
 };
 
 const add_prescriptions = (req, res) => {
-    const { appointment_id, medicine_name, dosage, usage_instruction, duration } = req.body;
+    const { appointment_id, medicine_name, quantity, pills_per_day, doses_per_day } = req.body;
 
-    if (!appointment_id || !medicine_name || !dosage || !usage_instruction || !duration) {
-        return res.status(400).json({ error: 'Thiếu dữ liệu' });
+    if (!appointment_id || !medicine_name || !quantity || !pills_per_day || !doses_per_day) {
+        return res.status(400).json({ message: 'Tất cả các trường là bắt buộc' });
     }
 
     // 1. Lấy doctor_id và patient_id từ Appointments
@@ -198,26 +196,40 @@ const add_prescriptions = (req, res) => {
 
             const prescription_id = prescriptionResult.insertId;
 
-            // 3. Thêm vào bảng Prescription_Details
-            const insertDetailQuery = `
-                INSERT INTO Prescription_Details (prescription_id, medicine_name, dosage, usage_instruction, duration)
-                VALUES (?, ?, ?, ?, ?)
-            `;
+            // 3. Lấy medicine_id từ bảng Medicines
+            const getMedicineIdQuery = 'SELECT medicine_id FROM Medicines WHERE medicine_name = ?';
 
-            connection.query(insertDetailQuery, [prescription_id, medicine_name, dosage, usage_instruction, duration], (err) => {
+            connection.query(getMedicineIdQuery, [medicine_name], (err, medicineResults) => {
                 if (err) {
-                    console.error('Lỗi khi thêm chi tiết đơn thuốc:', err);
-                    return res.status(500).json({ message: 'Lỗi khi thêm chi tiết đơn thuốc' });
+                    console.error('Lỗi khi truy vấn thuốc:', err);
+                    return res.status(500).json({ message: 'Lỗi khi truy vấn thuốc' });
                 }
 
-                // 4. Thành công
-                return res.status(201).json({
-                    message: 'Success',
+                if (medicineResults.length === 0) {
+                    return res.status(404).json({ message: 'Không tìm thấy thuốc với tên đã cho' });
+                }
+
+                const medicine_id = medicineResults[0].medicine_id;
+
+                // 4. Thêm vào bảng Prescription_Details
+                const insertDetailQuery = `
+                    INSERT INTO Prescription_Details (prescription_id, medicine_id, quantity, pills_per_day, doses_per_day)
+                    VALUES (?, ?, ?, ?, ?)
+                `;
+
+                connection.query(insertDetailQuery, [prescription_id, medicine_id, quantity, pills_per_day, doses_per_day], (err) => {
+                    if (err) {
+                        console.error('Lỗi khi thêm chi tiết đơn thuốc:', err);
+                        return res.status(500).json({ message: 'Lỗi khi thêm chi tiết đơn thuốc' });
+                    }
+
+                    return res.status(201).json({ message: 'Success' });
                 });
             });
         });
     });
 };
+
 
 const update_preliminary = (req, res) => {
     const { appointment_id, preliminary_diagnosis, final_conclusion, recommendations } = req.body;
@@ -283,27 +295,45 @@ const update_preliminary = (req, res) => {
 };
 
 const update_prescriptions = (req, res) => {
-    const { prescription_id, medicine_name, dosage, usage_instruction, duration } = req.body;
+    const { prescription_id, medicine_name, quantity, pills_per_day, doses_per_day } = req.body;
 
-    if (!prescription_id || !medicine_name || !dosage || !usage_instruction || !duration) {
+    if (!prescription_id || !medicine_name || !quantity || !pills_per_day || !doses_per_day) {
         return res.status(400).json({ error: 'Tất cả các trường là bắt buộc' });
     }
 
-    const query = `
-        UPDATE Prescription_Details
-        SET medicine_name = ?, dosage = ?, usage_instruction = ?, duration = ?
-        WHERE prescription_id = ?
-    `;
+    // 1. Lấy medicine_id từ medicine_name
+    const getMedicineIdQuery = 'SELECT medicine_id FROM Medicines WHERE medicine_name = ?';
 
-    connection.query(query, [medicine_name, dosage, usage_instruction, duration, prescription_id], (err) => {
+    connection.query(getMedicineIdQuery, [medicine_name], (err, medicineResults) => {
         if (err) {
-            console.error('Lỗi khi cập nhật đơn thuốc:', err);
-            return res.status(500).json({ error: 'Lỗi khi cập nhật đơn thuốc' });
+            console.error('Lỗi truy vấn thuốc:', err);
+            return res.status(500).json({ error: 'Lỗi khi truy vấn thuốc' });
         }
 
-        res.status(200).json({ message: 'Success' });
+        if (medicineResults.length === 0) {
+            return res.status(404).json({ error: 'Không tìm thấy thuốc' });
+        }
+
+        const medicine_id = medicineResults[0].medicine_id;
+
+        // 2. Cập nhật Prescription_Details
+        const updateQuery = `
+            UPDATE Prescription_Details
+            SET medicine_id = ?, quantity = ?, pills_per_day = ?, doses_per_day = ?
+            WHERE prescription_id = ?
+        `;
+
+        connection.query(updateQuery, [medicine_id, quantity, pills_per_day, doses_per_day, prescription_id], (err) => {
+            if (err) {
+                console.error('Lỗi khi cập nhật đơn thuốc:', err);
+                return res.status(500).json({ error: 'Lỗi khi cập nhật đơn thuốc' });
+            }
+
+            return res.status(200).json({ message: 'Success' });
+        });
     });
 };
+
 
 const delete_prescriptions = (req, res) => {
     const { prescription_id } = req.body;
@@ -343,6 +373,22 @@ const delete_prescriptions = (req, res) => {
     });
 };
 
+const get_all_medicines = (req, res) => {
+    const query = 'SELECT medicine_name, usage_instruction  FROM Medicines';
+
+    connection.query(query, (err, results) => {
+        if (err) {
+            console.error('Error fetching medicines:', err);
+            return res.status(500).json({ error: 'Error fetching medicines' });
+        }
+
+        res.status(200).json({
+            message: 'Success',
+            data: results
+        });
+    });
+};
+
 
 
 module.exports = {
@@ -351,5 +397,6 @@ module.exports = {
     add_prescriptions,
     update_preliminary,
     update_prescriptions,
-    delete_prescriptions
+    delete_prescriptions,
+    get_all_medicines
 }

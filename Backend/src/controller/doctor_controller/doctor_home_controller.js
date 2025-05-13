@@ -30,7 +30,7 @@ const number_of_appointment_today = async (req, res) => {
         const appointmentQuery = `
             SELECT COUNT(*) AS number_of_appointment_today, doctor_id
             FROM Appointments 
-            WHERE doctor_id = ? AND DATE(appointment_datetime) = CURDATE()
+            WHERE doctor_id = ? AND DATE(appointment_datetime) = CURDATE() AND status = 'Confirmed'
         `;
 
         connection.query(appointmentQuery, [doctor_id], (err, appointmentResults) => {
@@ -70,14 +70,27 @@ const today_appointment = (req, res) => {
 
         const doctor_id = doctorResults[0].doctor_id;
 
-        // Lấy ngày hôm nay theo giờ Việt Nam
         const todayVN = moment().tz("Asia/Ho_Chi_Minh").format("YYYY-MM-DD");
 
         const appointmentQuery = `
-            SELECT ap.appointment_id, ap.doctor_id, ap.patient_id, ap.appointment_datetime, ap.status, p.avatar, p.full_name, ap.is_online
+            SELECT 
+                ap.appointment_id, 
+                ap.doctor_id, 
+                ap.patient_id, 
+                ap.appointment_datetime, 
+                ap.status, 
+                p.avatar, 
+                p.full_name, 
+                ap.is_online
             FROM Appointments ap
             JOIN Patients p ON ap.patient_id = p.patient_id
-            WHERE ap.doctor_id = ? AND DATE(ap.appointment_datetime) = ?
+            JOIN Waiting_list wl ON ap.appointment_id = wl.appointment_id
+            WHERE 
+                ap.doctor_id = ? 
+                AND DATE(ap.appointment_datetime) = ? 
+                AND ap.status = 'Confirmed'
+                AND wl.status = 'waiting'
+            
         `;
 
         connection.query(appointmentQuery, [doctor_id, todayVN], (err, results) => {
@@ -86,10 +99,11 @@ const today_appointment = (req, res) => {
                 return res.status(500).json({ message: "Lỗi máy chủ khi lấy lịch hẹn" });
             }
 
-            // Chuyển appointment_datetime sang giờ Việt Nam
             const converted = results.map(r => ({
                 ...r,
-                appointment_datetime: moment(r.appointment_datetime).tz("Asia/Ho_Chi_Minh").format("YYYY-MM-DD HH:mm:ss")
+                appointment_datetime: moment(r.appointment_datetime)
+                    .tz("Asia/Ho_Chi_Minh")
+                    .format("YYYY-MM-DD HH:mm:ss")
             }));
 
             return res.status(200).json({
@@ -101,68 +115,7 @@ const today_appointment = (req, res) => {
 };
 
 
-const number_of_waiting = async (req, res) => {
-    const authorization_id = req.user?.authorization_id;
-    const { requested_time } = req.body;
-
-    if (!authorization_id) {
-        return res.status(401).json({ message: "Không tìm thấy authorization_id từ token" });
-    }
-
-    if (!requested_time) {
-        return res.status(400).json({ message: "Vui lòng cung cấp requested_time trong body" });
-    }
-
-    // Lấy ngày hiện tại theo múi giờ Việt Nam
-    const vnDate = moment().tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD');
-    const requested_datetime = `${vnDate} ${requested_time}`; // dạng 'YYYY-MM-DD HH:mm'
-
-    // Truy vấn doctor_id từ authorization_id
-    const getDoctorIdQuery = `
-        SELECT doctor_id FROM Doctors WHERE authorization_id = ?
-    `;
-
-    connection.query(getDoctorIdQuery, [authorization_id], (err, doctorResults) => {
-        if (err) {
-            console.error("Lỗi truy vấn cơ sở dữ liệu (Doctors):", err.message);
-            return res.status(500).json({ message: "Lỗi máy chủ khi tìm doctor_id" });
-        }
-
-        if (doctorResults.length === 0) {
-            return res.status(404).json({ message: "Không tìm thấy bác sĩ tương ứng" });
-        }
-
-        const doctor_id = doctorResults[0].doctor_id;
-
-        // Truy vấn số người đang "waiting" với đúng thời gian cụ thể
-        const waitingQuery = `
-            SELECT COUNT(*) AS number_of_waiting
-            FROM Waiting_list 
-            WHERE doctor_id = ? AND status = 'waiting' AND requested_datetime = ?
-        `;
-
-        connection.query(waitingQuery, [doctor_id, requested_datetime], (err, waitingResults) => {
-            if (err) {
-                console.error("Lỗi truy vấn cơ sở dữ liệu (Waiting_list):", err.message);
-                return res.status(500).json({ message: "Lỗi máy chủ khi lấy danh sách waiting" });
-            }
-
-            return res.status(200).json({
-                message: "Success",
-                data: {
-                    number_of_waiting: waitingResults[0].number_of_waiting,
-                    requested_datetime
-                }
-            });
-        });
-    });
-};
-
-
-
-
 module.exports = {
     number_of_appointment_today,
-    today_appointment,
-    number_of_waiting
+    today_appointment
 };

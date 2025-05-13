@@ -80,7 +80,7 @@ const all_appointments = async (req, res) => {
 };
 
 const create_appointment = (req, res) => {
-    const { patient_id, doctor_id, appointment_date, appointment_time, status, reason, is_deposit, consultation_fee, is_online } = req.body;
+    const { patient_id, doctor_id, appointment_date, appointment_time, status, reason, is_deposit, consultation_fee, is_paid, is_online } = req.body;
 
     const formattedTime = appointment_time.length === 5 ? appointment_time + ':00' : appointment_time;
     const appointment_datetime = `${appointment_date} ${formattedTime}`;
@@ -103,7 +103,7 @@ const create_appointment = (req, res) => {
             // 2. Tạo cuộc hẹn mới
             const insertQuery = `
                 INSERT INTO Appointments 
-                (patient_id, doctor_id, appointment_datetime, status, reason, is_deposit, consultation_fee, is_online)
+                (patient_id, doctor_id, appointment_datetime, status, reason, is_deposit, consultation_fee, is_paid, is_online)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             `;
 
@@ -115,6 +115,7 @@ const create_appointment = (req, res) => {
                 reason,
                 is_deposit,
                 consultation_fee,
+                is_paid,
                 is_online
             ];
 
@@ -212,10 +213,80 @@ const check_doctor_appointment = (req, res) => {
         });
     });
 }
+const get_appointment_detail = (req, res) => {
+    const { appointment_id } = req.body;
+
+    if (!appointment_id) {
+        return res.status(400).json({ message: 'appointment_id is required' });
+    }
+
+    const query = `
+      SELECT 
+        a.appointment_id,
+        d.doctor_id,
+        p.patient_id,
+        d.full_name AS doctor_name,
+        d.avatar AS doctor_avatar,
+        d.specialty AS doctor_specialy,
+        p.full_name AS patient_name,
+        a.appointment_datetime,
+        a.reason,
+        a.status,
+        a.is_online,
+        TRIM(TRAILING '.00' FROM FORMAT(a.consultation_fee, 2)) AS consultation_fee,
+        fc.final_conclusion,
+        fc.recommendations,
+        (SELECT COUNT(*) FROM Prescriptions pr WHERE pr.appointment_id = a.appointment_id) > 0 AS has_prescription
+      FROM Appointments a
+      JOIN Doctors d ON a.doctor_id = d.doctor_id
+      JOIN Patients p ON a.patient_id = p.patient_id
+      LEFT JOIN Final_Conclusions fc ON fc.appointment_id = a.appointment_id
+      WHERE a.appointment_id = ?
+    `;
+
+    connection.query(query, [appointment_id], (err, results) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({ message: 'Internal server error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Appointment not found' });
+        }
+
+        const row = results[0];
+        const vnTime = moment.tz(row.appointment_datetime, 'Asia/Ho_Chi_Minh');
+        const appointment_time = vnTime.format('HH:mm');
+        const appointment_date = vnTime.format('YYYY-MM-DD');
+
+        return res.status(200).json({
+            message: 'Success',
+            data: {
+                appointment_id: row.appointment_id,
+                doctor_id: row.doctor_id,
+                patient_id: row.patient_id,
+                doctor_name: row.doctor_name,
+                doctor_avatar: row.doctor_avatar,
+                doctor_specialist: row.doctor_specialy,
+                patient_name: row.patient_name,
+                appointment_date: appointment_date,
+                appointment_time: appointment_time,
+                reason: row.reason,
+                status: row.status,
+                is_online: row.is_online,
+                consultation_fee: row.consultation_fee,
+                final_conclusion: row.final_conclusion,
+                recommendations: row.recommendations,
+                has_prescription: row.has_prescription
+            }
+        });
+    });
+};
 
 module.exports = {
     doctor_detail,
     all_appointments,
     create_appointment,
-    check_doctor_appointment
+    check_doctor_appointment,
+    get_appointment_detail
 }
