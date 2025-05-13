@@ -9,10 +9,6 @@
         android:id="@+id/nav_appointment"
         android:icon="@drawable/calender"/>
 
-    <item android:title="Đơn thuốc"
-        android:id="@+id/nav_medicine"
-        android:icon="@drawable/nav_medicine"/>
-
     <item android:title="Hồ sơ"
         android:id="@+id/nav_profile"
         android:icon="@drawable/profile"/>

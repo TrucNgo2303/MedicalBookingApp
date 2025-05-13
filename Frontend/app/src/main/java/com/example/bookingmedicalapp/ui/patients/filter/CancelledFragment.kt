@@ -15,6 +15,8 @@ import com.example.bookingmedicalapp.databinding.FragmentCancelledBinding
 import com.example.bookingmedicalapp.model.AppointmentNotiItem
 import com.example.bookingmedicalapp.model.StatusRequest
 import com.example.bookingmedicalapp.source.repository.RemoteRepository
+import com.example.bookingmedicalapp.ui.patients.MedicalReportFragment
+import com.example.bookingmedicalapp.utils.addWithNavFragment
 import io.reactivex.disposables.CompositeDisposable
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -80,6 +82,7 @@ internal class CancelledFragment : BaseDataBindingFragment<FragmentCancelledBind
                         // Return a pair of AppointmentNotiItem and its Date for sorting
                         Pair(
                             AppointmentNotiItem(
+                                appointmentId = appointment.appointment_id,
                                 date = formattedDate,
                                 time = finalTime,
                                 avatar = appointment.doctor_avatar,
@@ -94,6 +97,10 @@ internal class CancelledFragment : BaseDataBindingFragment<FragmentCancelledBind
                     // Update adapter with new data
                     adapter =
                         AppointmentNotiAdapter(appointmentItems, "Đã hủy lịch khám", R.color.red)
+                        {selectedItem ->
+                            Log.d("AppointmentClick", "Appointment ID: ${selectedItem.appointmentId}")
+                            parentFragmentManager.addWithNavFragment(fragment = MedicalReportFragment.newInstance())
+                        }
                     recyclerView.adapter = adapter
                 }
             },{ throwable->

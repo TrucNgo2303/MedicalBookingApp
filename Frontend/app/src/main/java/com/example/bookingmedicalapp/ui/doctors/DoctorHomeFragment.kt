@@ -1,5 +1,6 @@
 package com.example.bookingmedicalapp.ui.doctors
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -7,6 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookingmedicalapp.R
@@ -17,11 +19,14 @@ import com.example.bookingmedicalapp.common.Constants
 import com.example.bookingmedicalapp.databinding.FragmentDoctorHomeBinding
 import com.example.bookingmedicalapp.model.DoctorAppointment
 import com.example.bookingmedicalapp.source.repository.RemoteRepository
+import com.example.bookingmedicalapp.ui.LoadingActivity
 import com.example.bookingmedicalapp.ui.signupsignin.SignInFragment
 import com.example.bookingmedicalapp.utils.TokenAction
 import com.example.bookingmedicalapp.utils.addFragment
+import com.example.bookingmedicalapp.utils.addWithNavDocTorFragment
 import com.example.bookingmedicalapp.utils.addWithNavFragment
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -31,6 +36,7 @@ internal class DoctorHomeFragment : BaseDataBindingFragment<FragmentDoctorHomeBi
     private val compositeDisposable = CompositeDisposable()
     private lateinit var mainViewModel: MainViewModel
     private lateinit var appointmentAdapter: DoctorAppointmentAdapter
+    private var appointmentJob: Job? = null
 
     companion object {
         @JvmStatic
@@ -53,17 +59,17 @@ internal class DoctorHomeFragment : BaseDataBindingFragment<FragmentDoctorHomeBi
         mainViewModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
         setupRecyclerView()
         callApiNum()
-        callApiTodayAppointment()
         mBinding.imvAvatar.setOnClickListener {
             val sharedPref = TokenAction(requireContext())
             sharedPref.clearToken()
-            parentFragmentManager.addFragment(fragment = SignInFragment.newInstance())
-        }
-        mBinding.btnSchedule.setOnClickListener {
-            parentFragmentManager.addFragment(fragment = DoctorScheduleFragment.newInstance())
+            // Xóa toàn bộ back stack
+            parentFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+            val intent = Intent(requireContext(), LoadingActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            requireActivity().finish()
         }
     }
-
     private fun setupRecyclerView() {
         appointmentAdapter = DoctorAppointmentAdapter()
         mBinding.rcvAppointmentToday.apply {
@@ -73,7 +79,7 @@ internal class DoctorHomeFragment : BaseDataBindingFragment<FragmentDoctorHomeBi
         // Thêm xử lý click cho item
         appointmentAdapter.onItemClick = { appointmentId ->
             mainViewModel.save_appointment_id = appointmentId
-            parentFragmentManager.addFragment(fragment = AppointmentDetailFragment.newInstance())
+            parentFragmentManager.addWithNavDocTorFragment(fragment = AppointmentDetailFragment.newInstance())
         }
     }
 
@@ -83,7 +89,13 @@ internal class DoctorHomeFragment : BaseDataBindingFragment<FragmentDoctorHomeBi
                 Log.d("API", "API Response: $response")
                 mBinding.tvNumberAppointment.text = response.data.number_of_appointment_today.toString()
             }, { throwable ->
-                Log.e("API", "API ERROR: $throwable")
+                if (throwable is retrofit2.HttpException && throwable.code() == 401) {
+                    val sharedPref = TokenAction(requireContext())
+                    sharedPref.clearToken()
+                    parentFragmentManager.addFragment(fragment = SignInFragment.newInstance())
+                } else {
+                    Log.e("API", "API ERROR: $throwable")
+                }
             })
         )
     }
@@ -117,9 +129,38 @@ internal class DoctorHomeFragment : BaseDataBindingFragment<FragmentDoctorHomeBi
                 }
                 appointmentAdapter.updateAppointments(appointments)
             }, { throwable ->
-                Log.e("API", "API ERROR TodayAppointment: $throwable")
+                if (throwable is retrofit2.HttpException && throwable.code() == 401) {
+                    val sharedPref = TokenAction(requireContext())
+                    sharedPref.clearToken()
+                    parentFragmentManager.addFragment(fragment = SignInFragment.newInstance())
+                } else {
+                    Log.e("API", "API ERROR: $throwable")
+                }
             })
         )
+    }
+
+    private fun startRepeatingAppointment() {
+        appointmentJob = CoroutineScope(Dispatchers.Main).launch {
+            while (isActive) {
+                callApiTodayAppointment()
+                delay(5_000) // đợi 30 giây
+            }
+        }
+    }
+
+    private fun stopRepeatingAppointment() {
+        appointmentJob?.cancel()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        startRepeatingAppointment()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        stopRepeatingAppointment()
     }
 
     override fun onDestroy() {

@@ -39,6 +39,7 @@ class MainViewModel: ViewModel() {
     var doctor_specialy: String? = null
     var doctor_qualification: String? = null
     var doctor_avatar: String? = null
+    var appointment_id: Int? = null
 
     //For Bill
     var timeChoose: String? = null

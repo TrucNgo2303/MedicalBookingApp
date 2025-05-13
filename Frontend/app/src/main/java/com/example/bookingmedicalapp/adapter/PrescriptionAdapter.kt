@@ -27,26 +27,26 @@ class PrescriptionAdapter(
 
     inner class PrescriptionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val edtMedicine: EditText = itemView.findViewById(R.id.edt_medicine)
-        private val edtDosage: EditText = itemView.findViewById(R.id.edt_dosage)
-        private val edtUsage: EditText = itemView.findViewById(R.id.edt_usage)
-        private val edtDuration: EditText = itemView.findViewById(R.id.edt_duration)
+        private val edtQuantity: EditText = itemView.findViewById(R.id.edt_quantity)
+        private val edtPill: EditText = itemView.findViewById(R.id.edt_pills_per_day)
+        private val edtDoses: EditText = itemView.findViewById(R.id.edt_doses_per_day)
         private val btnChange: AppCompatButton = itemView.findViewById(R.id.btn_change)
         private val btnDelete: AppCompatButton = itemView.findViewById(R.id.btn_delete)
 
         fun bind(prescription: PrescriptionDetails) {
             // Gán dữ liệu vào các EditText
             edtMedicine.setText(prescription.medicine_name)
-            edtDosage.setText(prescription.dosage)
-            edtUsage.setText(prescription.usage_instruction)
-            edtDuration.setText(prescription.duration.toString())
+            edtQuantity.setText(prescription.quantity.toString())
+            edtPill.setText(prescription.pills_per_day.toString())
+            edtDoses.setText(prescription.doses_per_day.toString())
 
             // Xử lý sự kiện click nút "Thay đổi"
             btnChange.setOnClickListener {
                 val updatedPrescription = prescription.copy(
                     medicine_name = edtMedicine.text.toString(),
-                    dosage = edtDosage.text.toString(),
-                    usage_instruction = edtUsage.text.toString(),
-                    duration = edtDuration.text.toString().toIntOrNull() ?: prescription.duration
+                    quantity = edtQuantity.text.toString(),
+                    pills_per_day = edtPill.text.toString().toIntOrNull() ?: prescription.pills_per_day,
+                    doses_per_day = edtDoses.text.toString()
                 )
                 onChangeClick(updatedPrescription)
             }

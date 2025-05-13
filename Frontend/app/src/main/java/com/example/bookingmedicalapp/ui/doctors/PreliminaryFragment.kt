@@ -82,10 +82,10 @@ internal class PreliminaryFragment : BaseDataBindingFragment<FragmentPreliminary
         )
     }
     private fun callApiAddPrescriptions() {
-        val durationText = mBinding.edtDuration.text.toString()
-        val duration = durationText.toIntOrNull()
+        val pillPerDayText = mBinding.edtUsageInstruction.text.toString()
+        val pillPerDay = pillPerDayText.toIntOrNull()
 
-        if (duration == null) {
+        if (pillPerDay == null) {
             Toast.makeText(requireContext(), "Vui lòng nhập số hợp lệ cho thời gian sử dụng", Toast.LENGTH_SHORT).show()
             return
         }
@@ -96,8 +96,8 @@ internal class PreliminaryFragment : BaseDataBindingFragment<FragmentPreliminary
                     mainViewModel.save_appointment_id,
                     mBinding.edtMedicineName.text.toString(),
                     mBinding.edtDosage.text.toString(),
-                    mBinding.edtUsageInstruction.text.toString(),
-                    duration
+                    pillPerDay,
+                    mBinding.edtDuration.text.toString()
                 )
             ).subscribe({ response ->
                 Log.d("API", "API Response: $response")
@@ -150,9 +150,9 @@ internal class PreliminaryFragment : BaseDataBindingFragment<FragmentPreliminary
                 UpdatePrescriptionsRequest(
                     prescription_id,
                     prescription.medicine_name,
-                    prescription.dosage,
-                    prescription.usage_instruction,
-                    prescription.duration
+                    prescription.quantity,
+                    prescription.pills_per_day,
+                    prescription.doses_per_day
                 )
             ).subscribe({ response ->
                 Log.d("API", "API Response: $response")

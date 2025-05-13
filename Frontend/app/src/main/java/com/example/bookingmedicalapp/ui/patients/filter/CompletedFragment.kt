@@ -6,15 +6,19 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookingmedicalapp.R
 import com.example.bookingmedicalapp.adapter.AppointmentNotiAdapter
 import com.example.bookingmedicalapp.base.BaseDataBindingFragment
+import com.example.bookingmedicalapp.base.MainViewModel
 import com.example.bookingmedicalapp.databinding.FragmentCompletedBinding
 import com.example.bookingmedicalapp.model.AppointmentNotiItem
 import com.example.bookingmedicalapp.model.StatusRequest
 import com.example.bookingmedicalapp.source.repository.RemoteRepository
+import com.example.bookingmedicalapp.ui.patients.MedicalReportFragment
+import com.example.bookingmedicalapp.utils.addWithNavFragment
 import io.reactivex.disposables.CompositeDisposable
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -26,6 +30,7 @@ internal class CompletedFragment : BaseDataBindingFragment<FragmentCompletedBind
     private lateinit var adapter: AppointmentNotiAdapter
     private val repository = RemoteRepository.getInstance()
     private val compositeDisposable = CompositeDisposable()
+    private lateinit var mainViewModel: MainViewModel
 
     companion object {
         @JvmStatic
@@ -46,6 +51,7 @@ internal class CompletedFragment : BaseDataBindingFragment<FragmentCompletedBind
     }
 
     override fun initialize() {
+        mainViewModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
         recyclerView = mBinding.rcvCompleted
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
@@ -80,6 +86,7 @@ internal class CompletedFragment : BaseDataBindingFragment<FragmentCompletedBind
                         // Return a pair of AppointmentNotiItem and its Date for sorting
                         Pair(
                             AppointmentNotiItem(
+                                appointmentId = appointment.appointment_id,
                                 date = formattedDate,
                                 time = finalTime,
                                 avatar = appointment.doctor_avatar,
@@ -93,6 +100,11 @@ internal class CompletedFragment : BaseDataBindingFragment<FragmentCompletedBind
 
                     // Update adapter with new data
                     adapter = AppointmentNotiAdapter(appointmentItems, "Hoàn thành", R.color.green)
+                    {selectedItem ->
+                        mainViewModel.appointment_id = selectedItem.appointmentId
+                        Log.d("API", "Appointment ID: ${mainViewModel.appointment_id}")
+                        parentFragmentManager.addWithNavFragment(fragment = MedicalReportFragment.newInstance())
+                    }
                     recyclerView.adapter = adapter
                 }
             },{ throwable->

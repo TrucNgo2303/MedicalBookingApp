@@ -3,15 +3,20 @@ package com.example.bookingmedicalapp.ui.patients.filter
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookingmedicalapp.R
 import com.example.bookingmedicalapp.adapter.AppointmentNotiAdapter
 import com.example.bookingmedicalapp.base.BaseDataBindingFragment
+import com.example.bookingmedicalapp.base.MainViewModel
 import com.example.bookingmedicalapp.databinding.FragmentPendingBinding
 import com.example.bookingmedicalapp.model.AppointmentNotiItem
 import com.example.bookingmedicalapp.model.StatusRequest
 import com.example.bookingmedicalapp.source.repository.RemoteRepository
+import com.example.bookingmedicalapp.ui.patients.MedicalReportFragment
+import com.example.bookingmedicalapp.utils.addFragment
+import com.example.bookingmedicalapp.utils.addWithNavFragment
 import io.reactivex.disposables.CompositeDisposable
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -24,6 +29,7 @@ internal class PendingFragment : BaseDataBindingFragment<FragmentPendingBinding,
     private lateinit var adapter: AppointmentNotiAdapter
     private val repository = RemoteRepository.getInstance()
     private val compositeDisposable = CompositeDisposable()
+    private lateinit var mainViewModel: MainViewModel
 
     companion object {
         @JvmStatic
@@ -44,7 +50,7 @@ internal class PendingFragment : BaseDataBindingFragment<FragmentPendingBinding,
     }
 
     override fun initialize() {
-
+        mainViewModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
         recyclerView = mBinding.rcvPending
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
@@ -79,6 +85,7 @@ internal class PendingFragment : BaseDataBindingFragment<FragmentPendingBinding,
                         // Return a pair of AppointmentNotiItem and its Date for sorting
                         Pair(
                             AppointmentNotiItem(
+                                appointmentId = appointment.appointment_id,
                                 date = formattedDate,
                                 time = finalTime,
                                 avatar = appointment.doctor_avatar,
@@ -95,7 +102,12 @@ internal class PendingFragment : BaseDataBindingFragment<FragmentPendingBinding,
                         appointmentItems,
                         "Chờ xác nhận",
                         R.color.blue_medium
-                    )
+                    ){selectedItem ->
+                        Log.d("API", "Appointment ID: ${selectedItem.appointmentId}")
+                        mainViewModel.appointment_id = selectedItem.appointmentId
+                        Log.d("API", "Appointment ID: ${mainViewModel.appointment_id}")
+                        parentFragmentManager.addWithNavFragment(fragment = MedicalReportFragment.newInstance())
+                    }
                     recyclerView.adapter = adapter
                 }
             },{ throwable->

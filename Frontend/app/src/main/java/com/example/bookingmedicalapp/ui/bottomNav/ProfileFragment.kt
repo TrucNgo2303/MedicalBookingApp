@@ -58,7 +58,6 @@ internal class ProfileFragment : BaseDataBindingFragment<FragmentProfileBinding,
 
         val profileItems = listOf(
             ProfileItem(R.drawable.user_edit_profile, "Chỉnh sửa hồ sơ", R.drawable.arrow_right),
-            ProfileItem(R.drawable.user_favourite, "Yêu thích", R.drawable.arrow_right),
             ProfileItem(R.drawable.user_notification, "Thông báo", R.drawable.arrow_right),
             ProfileItem(R.drawable.setting, "Cài đặt", R.drawable.arrow_right),
             ProfileItem(R.drawable.user_help, "Trợ giúp & Hỗ trợ", R.drawable.arrow_right),

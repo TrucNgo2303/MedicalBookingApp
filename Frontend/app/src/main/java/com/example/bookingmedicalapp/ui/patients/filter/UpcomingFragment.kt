@@ -15,6 +15,8 @@ import com.example.bookingmedicalapp.databinding.FragmentUpcomingBinding
 import com.example.bookingmedicalapp.model.AppointmentNotiItem
 import com.example.bookingmedicalapp.model.StatusRequest
 import com.example.bookingmedicalapp.source.repository.RemoteRepository
+import com.example.bookingmedicalapp.ui.patients.MedicalReportFragment
+import com.example.bookingmedicalapp.utils.addWithNavFragment
 import io.reactivex.disposables.CompositeDisposable
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -82,6 +84,7 @@ internal class UpcomingFragment : BaseDataBindingFragment<FragmentUpcomingBindin
                         // Return a pair of AppointmentNotiItem and its Date for sorting
                         Pair(
                             AppointmentNotiItem(
+                                appointmentId = appointment.appointment_id,
                                 date = formattedDate,
                                 time = finalTime,
                                 avatar = appointment.doctor_avatar,
@@ -96,6 +99,10 @@ internal class UpcomingFragment : BaseDataBindingFragment<FragmentUpcomingBindin
                     // Update adapter with new data
                     adapter =
                         AppointmentNotiAdapter(appointmentItems, "Lịch đã được đặt", R.color.orange)
+                        {selectedItem ->
+                            Log.d("AppointmentClick", "Appointment ID: ${selectedItem.appointmentId}")
+                            parentFragmentManager.addWithNavFragment(fragment = MedicalReportFragment.newInstance())
+                        }
                     recyclerView.adapter = adapter
                 }
             },{ throwable->

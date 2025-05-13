@@ -44,7 +44,7 @@ internal class DoctorScheduleFragment : BaseDataBindingFragment<FragmentDoctorSc
 
     override fun onLeftIconClick() {
         mBinding.imvBack.setOnClickListener {
-            onBackFragmentPressed()
+            parentFragmentManager.popBackStack()
         }
     }
 
@@ -108,42 +108,53 @@ internal class DoctorScheduleFragment : BaseDataBindingFragment<FragmentDoctorSc
 
     private fun callApi(appointment_date: String) {
         compositeDisposable.add(
-            repository.doctorSchedule(AppointmentDateRequest(appointment_date)).subscribe({ response ->
-                Log.d("API", "API Response: $response")
-                val appointments = response.data.map { item ->
-                    // Định dạng đúng với API response: 2025-04-23T01:00:00.000Z
-                    val dateTime = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).apply {
-                        timeZone = TimeZone.getTimeZone("UTC") // API response dùng UTC
-                    }.parse(item.appointment_datetime)
+            repository.doctorSchedule(AppointmentDateRequest(appointment_date))
+                .subscribe({ response ->
+                    Log.d("API", "API Response: $response")
 
-                    // Handle status transformation
-                    DoctorAppointment(
-                        appointment_id = item.appointment_id,
-                        avatar = item.avatar ?: "",
-                        patient_name = "${item.full_name}",
-                        status = item.status,
-                        date = SimpleDateFormat("dd-MM", Locale.getDefault()).format(dateTime),
-                        time = SimpleDateFormat("h:mm a", Locale("vi", "VN")).format(dateTime)
-                            .replace("AM", "SA").replace("PM", "CH"),
-                        is_online = item.is_online
-                    )
-                }.sortedBy { appointment ->
-                    when (appointment.status) {
-                        "Confirmed" -> 1
-                        "Pending" -> 2
-                        "Completed" -> 3
-                        "Cancelled" -> 4
-                        else -> 5 // Default case for unknown statuses
+                    val data = response.data
+
+                    if (data.isNullOrEmpty()) {
+                        // Nếu không có lịch => cập nhật adapter rỗng
+                        appointmentAdapter.updateAppointments(emptyList())
+                        Toast.makeText(context, "Không có lịch hẹn nào", Toast.LENGTH_SHORT).show()
+                        return@subscribe
                     }
-                }
-                appointmentAdapter.updateAppointments(appointments)
-            }, { throwable ->
-                Log.e("API", "API ERROR: $throwable")
-                // Hiển thị thông báo lỗi nếu cần
-                Toast.makeText(context, "Không có lịch hẹn nào", Toast.LENGTH_SHORT).show()
-            })
+
+                    val appointments = data.map { item ->
+                        val dateTime = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).apply {
+                            timeZone = TimeZone.getTimeZone("UTC")
+                        }.parse(item.appointment_datetime)
+
+                        DoctorAppointment(
+                            appointment_id = item.appointment_id,
+                            avatar = item.avatar ?: "",
+                            patient_name = item.full_name,
+                            status = item.status,
+                            date = SimpleDateFormat("dd-MM", Locale.getDefault()).format(dateTime),
+                            time = SimpleDateFormat("h:mm a", Locale("vi", "VN")).format(dateTime)
+                                .replace("AM", "SA").replace("PM", "CH"),
+                            is_online = item.is_online
+                        )
+                    }.sortedBy {
+                        when (it.status) {
+                            "Confirmed" -> 1
+                            "Pending" -> 2
+                            "Completed" -> 3
+                            "Cancelled" -> 4
+                            else -> 5
+                        }
+                    }
+
+                    appointmentAdapter.updateAppointments(appointments)
+                }, { throwable ->
+                    Log.e("API", "API ERROR: $throwable")
+                    Toast.makeText(context, "Không có lịch hẹn nào", Toast.LENGTH_SHORT).show()
+                    appointmentAdapter.updateAppointments(emptyList()) // ✅ Xoá dữ liệu nếu lỗi
+                })
         )
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

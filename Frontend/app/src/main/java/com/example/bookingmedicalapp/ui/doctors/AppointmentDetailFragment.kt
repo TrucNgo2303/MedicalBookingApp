@@ -16,6 +16,7 @@ import com.example.bookingmedicalapp.model.AppointmentDetailRequest
 import com.example.bookingmedicalapp.model.AppointmentRequest
 import com.example.bookingmedicalapp.source.repository.RemoteRepository
 import com.example.bookingmedicalapp.utils.addFragment
+import com.example.bookingmedicalapp.utils.addWithNavDocTorFragment
 import io.reactivex.disposables.CompositeDisposable
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
@@ -157,10 +158,10 @@ internal class AppointmentDetailFragment : BaseDataBindingFragment<FragmentAppoi
 
     private fun detailPreliminaryAndPrescriptions(){
         mBinding.tvArrow1.setOnClickListener {
-            parentFragmentManager.addFragment(fragment = PreliminaryFragment.newInstance())
+            parentFragmentManager.addWithNavDocTorFragment(fragment = PreliminaryFragment.newInstance())
         }
         mBinding.tvArrow2.setOnClickListener {
-            parentFragmentManager.addFragment(fragment = PreliminaryFragment.newInstance())
+            parentFragmentManager.addWithNavDocTorFragment(fragment = PreliminaryFragment.newInstance())
         }
     }
     override fun onResume() {

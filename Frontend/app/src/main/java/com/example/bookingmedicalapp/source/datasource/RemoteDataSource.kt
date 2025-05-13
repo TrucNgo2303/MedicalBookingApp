@@ -92,6 +92,10 @@ class RemoteDataSource : IRemoteDataSource {
         return apiServices.checkDoctorAppointment(request)
     }
 
+    override fun getAppointmentPatientDetail(request: AppointmentIdRequest): Observable<BasePatientResponse<AppointmentDetailPatientResponse>> {
+        return apiServices.getAppointmentPatientDetail(request)
+    }
+
     override fun numOfAppointment(): Observable<BaseDoctorResponse<NumOfAppointment>> {
         return apiServices.numOfAppointment()
     }
@@ -128,12 +132,8 @@ class RemoteDataSource : IRemoteDataSource {
         return apiServices.doctorSchedule(request)
     }
 
-    override fun checkDoctorSchedule(request: CheckDoctorRequest): Observable<BaseDoctorResponse<List<CheckDoctorResponse>>> {
-        return apiServices.checkDoctorSchedule(request)
-    }
-
-    override fun addWaiting(request: AddWaitingRequest): Observable<NormalResponse> {
-        return apiServices.addWaiting(request)
+    override fun getAllMedicines(): Observable<BaseDoctorResponse<List<MedicinesResponse>>> {
+        return apiServices.getAllMedicines()
     }
 
 

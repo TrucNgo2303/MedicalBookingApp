@@ -12,9 +12,8 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import com.example.bookingmedicalapp.R
+import com.example.bookingmedicalapp.ui.bottomNav.BottomNavDoctorActivity
 import com.example.bookingmedicalapp.ui.bottomNav.BottomNavMainActivity
-import com.example.bookingmedicalapp.ui.doctors.DoctorHomeFragment
-import com.example.bookingmedicalapp.ui.receptionist.ReceptionistHomeFragment
 import com.example.bookingmedicalapp.ui.signupsignin.SignInFragment
 import com.example.bookingmedicalapp.utils.TokenAction
 import com.example.bookingmedicalapp.utils.addFragment
@@ -43,10 +42,9 @@ class LoadingActivity : AppCompatActivity() {
                     }
                     "Doctor" -> {
                         // Điều hướng đến DoctorHomeFragment
-                        supportFragmentManager.addFragment(fragment = DoctorHomeFragment.newInstance())
-                    }
-                    "Receptionist" -> {
-                        supportFragmentManager.addFragment(fragment = ReceptionistHomeFragment.newInstance())
+                        val intent = Intent(this, BottomNavDoctorActivity::class.java)
+                        startActivity(intent)
+                        finish()
                     }
                     else -> {
                         // Xử lý trường hợp role không xác định

@@ -46,6 +46,8 @@ interface IRemoteDataSource {
 
     fun checkDoctorAppointment(request: DoctorDetailRequest): Observable<BasePatientResponse<List<CheckAppointmentResponse>>>
 
+    fun getAppointmentPatientDetail(request: AppointmentIdRequest): Observable<BasePatientResponse<AppointmentDetailPatientResponse>>
+
     //Doctor
     fun numOfAppointment(): Observable<BaseDoctorResponse<NumOfAppointment>>
 
@@ -65,8 +67,6 @@ interface IRemoteDataSource {
 
     fun doctorSchedule(request: AppointmentDateRequest): Observable<BaseDoctorResponse<List<TodayAppointmentResponse>>>
 
-    //Receptionist
-    fun checkDoctorSchedule(request: CheckDoctorRequest): Observable<BaseDoctorResponse<List<CheckDoctorResponse>>>
+    fun getAllMedicines(): Observable<BaseDoctorResponse<List<MedicinesResponse>>>
 
-    fun addWaiting(request: AddWaitingRequest) : Observable<NormalResponse>
 }

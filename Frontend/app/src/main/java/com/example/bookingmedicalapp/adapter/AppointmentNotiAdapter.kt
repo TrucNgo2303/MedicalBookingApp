@@ -16,7 +16,8 @@ import java.text.DecimalFormat
 class AppointmentNotiAdapter(
     private val items: List<AppointmentNotiItem>,
     private val message: String,
-    private val messageColor: Int
+    private val messageColor: Int,
+    private val onItemClick: (AppointmentNotiItem) -> Unit
 ) : RecyclerView.Adapter<AppointmentNotiAdapter.AppointmentNotiViewHolder>() {
 
     inner class AppointmentNotiViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -27,6 +28,15 @@ class AppointmentNotiAdapter(
         val specialist: AppCompatTextView = view.findViewById(R.id.tv_specialist)
         val fee: AppCompatTextView = view.findViewById(R.id.tv_fee)
         val message: AppCompatTextView = view.findViewById(R.id.tv_message)
+
+        init {
+            view.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    onItemClick(items[position])
+                }
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppointmentNotiViewHolder {

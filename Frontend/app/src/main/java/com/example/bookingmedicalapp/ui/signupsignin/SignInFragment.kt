@@ -4,21 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
 import com.example.bookingmedicalapp.R
 import com.example.bookingmedicalapp.base.BaseDataBindingFragment
 import com.example.bookingmedicalapp.common.Constants
 import com.example.bookingmedicalapp.databinding.FragmentSignInBinding
 import com.example.bookingmedicalapp.model.LoginRequest
 import com.example.bookingmedicalapp.source.repository.RemoteRepository
+import com.example.bookingmedicalapp.ui.bottomNav.BottomNavDoctorActivity
 import com.example.bookingmedicalapp.ui.bottomNav.BottomNavMainActivity
-import com.example.bookingmedicalapp.ui.doctors.DoctorHomeFragment
-import com.example.bookingmedicalapp.ui.patients.PatientHomeFragment
-import com.example.bookingmedicalapp.ui.receptionist.ReceptionistHomeFragment
 import com.example.bookingmedicalapp.utils.TokenAction
 import com.example.bookingmedicalapp.utils.addFragment
 import io.reactivex.disposables.CompositeDisposable
@@ -98,11 +91,9 @@ internal class SignInFragment : BaseDataBindingFragment<FragmentSignInBinding,Si
                         requireActivity().finish() // Kết thúc Activity hiện tại để ngăn quay lại
                     }
                     "Doctor" -> {
-                        // Điều hướng đến DoctorHomeFragment
-                        parentFragmentManager.addFragment(fragment = DoctorHomeFragment.newInstance())
-                    }
-                    "Receptionist" -> {
-                        parentFragmentManager.addFragment(fragment = ReceptionistHomeFragment.newInstance())
+                        val intent = Intent(requireContext(), BottomNavDoctorActivity::class.java)
+                        startActivity(intent)
+                        requireActivity().finish()
                     }
                     else -> {
                         // Xử lý trường hợp role không xác định

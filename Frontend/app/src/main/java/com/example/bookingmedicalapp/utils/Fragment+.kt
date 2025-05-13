@@ -36,3 +36,11 @@ fun FragmentManager.addFragmentWithAnimation(
         .addToBackStack(tag)
         .commit()
 }
+
+fun FragmentManager.addWithNavDocTorFragment(@IdRes id: Int = R.id.fragment_container_doctor, fragment: Fragment) {
+    val tag = fragment::class.java.simpleName
+    beginTransaction()
+        .add(id, fragment, tag)
+        .addToBackStack(tag)
+        .commit()
+}

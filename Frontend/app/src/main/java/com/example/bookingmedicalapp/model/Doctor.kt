@@ -62,18 +62,18 @@ data class PreliminaryDetailResponse(
 data class PrescriptionDetails(
     val detail_id: Int,
     val prescription_id: Int,
+    val quantity: String,
+    val pills_per_day: Int,
+    val doses_per_day: String,
     val medicine_name: String,
-    val dosage: String,
-    val usage_instruction: String,
-    val duration: Int,
 )
 
 data class AddPrescriptionsRequest(
     val appointment_id: Int?,
     val medicine_name: String,
-    val dosage: String,
-    val usage_instruction: String,
-    val duration: Int
+    val quantity: String,
+    val pills_per_day: Int,
+    val doses_per_day: String
 )
 
 data class NormalResponse(
@@ -90,9 +90,9 @@ data class UpdatePreliminaryRequest(
 data class UpdatePrescriptionsRequest(
     val prescription_id: Int,
     val medicine_name: String,
-    val dosage: String,
-    val usage_instruction: String,
-    val duration: Int
+    val quantity: String,
+    val pills_per_day: Int,
+    val doses_per_day: String
 )
 
 data class PrescriptionsRequest(
@@ -101,4 +101,9 @@ data class PrescriptionsRequest(
 
 data class AppointmentDateRequest(
     val appointment_date: String,
+)
+
+data class MedicinesResponse(
+    val medicine_name: String,
+    val usage_instruction: String
 )
