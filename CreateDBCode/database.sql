@@ -49,8 +49,7 @@ CREATE TABLE Appointments (
 
 CREATE TABLE Notifications (
     notification_id INT PRIMARY KEY AUTO_INCREMENT,
-    recipient_id INT NOT NULL,
-    recipient_role ENUM('Patient', 'Doctor', 'Admin') NOT NULL,
+    authorization_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     message TEXT NOT NULL,
     is_read BOOLEAN DEFAULT FALSE,
@@ -62,7 +61,6 @@ CREATE TABLE Specialists (
     specialist_name VARCHAR(255) NOT NULL,
     summary TEXT,
     icon VARCHAR(255),
-    max_patients_per_slot INT DEFAULT 5,
 	consultation_fee DECIMAL(10,2) NOT NULL DEFAULT 0.00
 );
 
@@ -102,10 +100,11 @@ CREATE TABLE Waiting_list (
 	waiting_list_id INT AUTO_INCREMENT PRIMARY KEY,
     patient_id INT NOT NULL,
     doctor_id INT NOT NULL,
-    requested_datetime DATETIME,
+    priority INT NOT NULL DEFAULT 0,
     appointment_id INT DEFAULT NULL,
     status ENUM ('waiting','assigned') DEFAULT 'waiting',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 CREATE TABLE Preliminary_Diagnoses (
     diagnosis_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -136,7 +135,7 @@ CREATE TABLE Prescription_Details (
     prescription_id INT NOT NULL,
     quantity VARCHAR(100) NOT NULL,
     pills_per_day INT NOT NULL,
-    duration VARCHAR(100) NOT NULL,
+    doses_per_day VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -190,7 +189,7 @@ DELIMITER ;
 ALTER TABLE Appointments ADD FOREIGN KEY (patient_id) REFERENCES Patients(patient_id);
 ALTER TABLE Appointments ADD FOREIGN KEY (doctor_id) REFERENCES Doctors(doctor_id);
 ALTER TABLE Doctors ADD FOREIGN KEY (specialist_id) REFERENCES Specialists(specialist_id);
-ALTER TABLE Notifications ADD FOREIGN KEY (recipient_id) REFERENCES Patients(patient_id) ON DELETE CASCADE;
+ALTER TABLE Notifications ADD FOREIGN KEY (authorization_id) REFERENCES Authorizations(authorization_id) ON DELETE CASCADE;
 ALTER TABLE Doctors ADD FOREIGN KEY (authorization_id) REFERENCES Authorizations(authorization_id);
 ALTER TABLE Patients ADD FOREIGN KEY (authorization_id) REFERENCES Authorizations(authorization_id);
 ALTER TABLE Comments ADD FOREIGN KEY (patient_id) REFERENCES Patients(patient_id) ON DELETE CASCADE;

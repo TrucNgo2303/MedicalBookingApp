@@ -41,3 +41,6 @@ SELECT*FROM Prescriptions;
 
 -- Check Prescription_Details data
 SELECT*FROM Prescription_Details;
+
+-- Check Medicines data
+SELECT*FROM Medicines;

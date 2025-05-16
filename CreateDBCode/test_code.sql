@@ -99,5 +99,49 @@ WHERE s.specialist_name = 'Nội tổng quát'
     WHERE a.appointment_datetime = '2025-04-25 10:00:00'
       AND a.status != 'Cancelled'
   );
+  
+		  SELECT 
+	a.appointment_id,
+	a.appointment_datetime,
+	a.status,
+	a.reason,
+	a.consultation_fee,
+	a.is_paid,
+	a.created_at,
+	p.full_name AS patient_name,
+	p.phone_number AS patient_phone_number,
+	d.full_name AS doctor_name,
+	d.specialty AS doctor_specialty
+FROM Appointments a
+JOIN Patients p ON a.patient_id = p.patient_id
+JOIN Doctors d ON a.doctor_id = d.doctor_id
+WHERE a.is_online = TRUE;
+
+SELECT ap.*
+FROM Appointments ap
+JOIN Waiting_list wl ON ap.appointment_id = wl.appointment_id
+WHERE 
+  ap.doctor_id = 1 AND
+  DATE(ap.appointment_datetime) = '2025-05-13' AND
+  ap.status = 'Confirmed';
+  
+SELECT 
+    d.doctor_id, 
+    d.full_name, 
+    d.avatar, 
+    d.specialty, 
+    d.qualification,
+    ROUND(AVG(c.star), 1) AS average_star,
+    SUM(CASE WHEN c.star = 5 THEN 1 ELSE 0 END) AS five_star_count
+FROM 
+    Doctors d
+JOIN 
+    Comments c ON d.doctor_id = c.doctor_id
+GROUP BY 
+    d.doctor_id, d.full_name, d.avatar, d.specialty, d.qualification
+ORDER BY 
+    average_star DESC,
+    five_star_count DESC
+LIMIT 5;
 
 
