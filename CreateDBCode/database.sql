@@ -43,6 +43,7 @@ CREATE TABLE Appointments (
     consultation_fee DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     is_paid  BOOLEAN DEFAULT FALSE,
     is_online BOOLEAN DEFAULT TRUE,
+    payment_status VARCHAR(255), 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -78,15 +79,6 @@ CREATE TABLE Comments (
     comment_detail TEXT,
     star INT CHECK (star BETWEEN 1 AND 5),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-CREATE TABLE Favorites (
-    favorite_id INT AUTO_INCREMENT PRIMARY KEY,
-    patient_id INT NOT NULL,
-    doctor_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT unique_favorite UNIQUE (patient_id, doctor_id),
-    CONSTRAINT fk_favorite_patient FOREIGN KEY (patient_id) REFERENCES Patients(patient_id) ON DELETE CASCADE,
-    CONSTRAINT fk_favorite_doctor FOREIGN KEY (doctor_id) REFERENCES Doctors(doctor_id) ON DELETE CASCADE
 );
 CREATE TABLE CommentReplies (
     reply_id INT AUTO_INCREMENT PRIMARY KEY,
